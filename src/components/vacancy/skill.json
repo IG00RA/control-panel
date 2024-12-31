@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_vacancy_skills",
+  "info": {
+    "displayName": "Skill",
+    "icon": "cloud",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Skill": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

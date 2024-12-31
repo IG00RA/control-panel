@@ -1,0 +1,82 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vacancies",
+  "info": {
+    "singularName": "vacancy",
+    "pluralName": "vacancies",
+    "displayName": "Vacancies",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "Title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "Description": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
+    },
+    "Skills": {
+      "displayName": "Skill",
+      "type": "component",
+      "repeatable": true,
+      "component": "vacancy.skill",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "Requirements": {
+      "displayName": "Requirements",
+      "type": "component",
+      "repeatable": true,
+      "component": "vacancy.requirements",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "Responsibilities": {
+      "displayName": "Responsibility",
+      "type": "component",
+      "repeatable": true,
+      "component": "vacancy.responsibility",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "Advantages": {
+      "displayName": "Advantages",
+      "type": "component",
+      "repeatable": true,
+      "component": "vacancy.advantages",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}

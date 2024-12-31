@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_vacancy_responsibilities",
+  "info": {
+    "displayName": "Responsibility",
+    "icon": "crown",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Responsibility": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

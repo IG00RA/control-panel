@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_vacancy_advantages",
+  "info": {
+    "displayName": "Advantages",
+    "icon": "shirt",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Advantage": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

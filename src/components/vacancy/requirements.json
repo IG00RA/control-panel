@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_vacancy_requirements",
+  "info": {
+    "displayName": "Requirements",
+    "icon": "feather",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Requirement": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
