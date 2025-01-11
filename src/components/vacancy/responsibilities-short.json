@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_vacancy_responsibilities_shorts",
+  "info": {
+    "displayName": "ResponsibilitiesShort",
+    "icon": "car"
+  },
+  "options": {},
+  "attributes": {
+    "ResponsibilityShort": {
+      "type": "string"
+    }
+  }
+}

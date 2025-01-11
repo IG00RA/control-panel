@@ -24,6 +24,17 @@ export interface VacancyRequirements extends Struct.ComponentSchema {
   };
 }
 
+export interface VacancyResponsibilitiesShort extends Struct.ComponentSchema {
+  collectionName: 'components_vacancy_responsibilities_shorts';
+  info: {
+    displayName: 'ResponsibilitiesShort';
+    icon: 'car';
+  };
+  attributes: {
+    ResponsibilityShort: Schema.Attribute.String;
+  };
+}
+
 export interface VacancyResponsibility extends Struct.ComponentSchema {
   collectionName: 'components_vacancy_responsibilities';
   info: {
@@ -53,6 +64,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'vacancy.advantages': VacancyAdvantages;
       'vacancy.requirements': VacancyRequirements;
+      'vacancy.responsibilities-short': VacancyResponsibilitiesShort;
       'vacancy.responsibility': VacancyResponsibility;
       'vacancy.skill': VacancySkill;
     }
