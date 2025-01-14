@@ -1,5 +1,5 @@
-nav.sc-KXCwU.ezSgZD.sc-gyycJP.eUpfNI.sc-jyxgdL.hvlBai {
-  & ul.sc-KXCwU.bcRGmA.sc-gyycJP.hVEWUy.sc-kyzCdK.fhmMfu {
+nav {
+  & ul {
     & li {
       a[href="/admin"],
       a[href="/admin/plugins/upload"],
