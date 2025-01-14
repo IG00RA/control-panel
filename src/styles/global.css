@@ -1,0 +1,11 @@
+nav.sc-KXCwU.ezSgZD.sc-gyycJP.eUpfNI.sc-jyxgdL.hvlBai {
+  & ul.sc-KXCwU.bcRGmA.sc-gyycJP.hVEWUy.sc-kyzCdK.fhmMfu {
+    & li {
+      a[href="/admin"],
+      a[href="/admin/plugins/upload"],
+      a[href="/admin/plugins/cloud"] {
+        display: none !important;
+      }
+    }
+  }
+}
