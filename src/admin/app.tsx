@@ -1,38 +1,20 @@
 import type { StrapiApp } from "@strapi/strapi/admin";
-import "../styles/global.css";
 
 export default {
   config: {
-    locales: [
-      // 'ar',
-      // 'fr',
-      // 'cs',
-      // 'de',
-      // 'dk',
-      // 'es',
-      // 'he',
-      // 'id',
-      // 'it',
-      // 'ja',
-      // 'ko',
-      // 'ms',
-      // 'nl',
-      // 'no',
-      // 'pl',
-      // 'pt-BR',
-      // 'pt',
-      "ru",
-      // 'sk',
-      // 'sv',
-      // 'th',
-      // 'tr',
-      "uk",
-      // 'vi',
-      // 'zh-Hans',
-      // 'zh',
-    ],
+    locales: ["ru", "uk"],
   },
   bootstrap(app: StrapiApp) {
     console.log(app);
+
+    const style = document.createElement("style");
+    style.innerHTML = `
+          nav ul li a[href="/admin"],
+      nav ul li a[href="/admin/plugins/upload"],
+      nav ul li a[href="/admin/plugins/cloud"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
   },
 };
