@@ -402,14 +402,7 @@ export interface ApiVacancyVacancy extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    DescriptionFull: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    DescriptionFullAdditional: Schema.Attribute.Text &
+    DescriptionFull: Schema.Attribute.RichText &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
