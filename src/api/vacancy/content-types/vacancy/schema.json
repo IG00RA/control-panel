@@ -86,6 +86,14 @@
       },
       "type": "richtext",
       "required": false
+    },
+    "YouTubeID": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
     }
   }
 }
