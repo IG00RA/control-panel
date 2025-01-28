@@ -373,6 +373,7 @@ export interface ApiMainPageElementMainPageElement
   extends Struct.CollectionTypeSchema {
   collectionName: 'main_page_elements';
   info: {
+    description: '';
     displayName: 'Main page elements';
     pluralName: 'main-page-elements';
     singularName: 'main-page-element';
@@ -418,6 +419,12 @@ export interface ApiMainPageElementMainPageElement
       'oneToMany',
       'api::main-page-element.main-page-element'
     >;
+    MainYoutubeVideoID: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -504,7 +511,7 @@ export interface ApiVacancyVacancy extends Struct.CollectionTypeSchema {
     YouTubeID: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: false;
+          localized: true;
         };
       }>;
   };
