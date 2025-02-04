@@ -19,11 +19,12 @@ export interface PricesConsumablesItem extends Struct.ComponentSchema {
 export interface PricesTariffsItem extends Struct.ComponentSchema {
   collectionName: 'components_prices_tariffs_items';
   info: {
+    description: '';
     displayName: 'TariffsItem';
     icon: 'cast';
   };
   attributes: {
-    TariffsItem: Schema.Attribute.Text;
+    TariffsItem: Schema.Attribute.String;
   };
 }
 

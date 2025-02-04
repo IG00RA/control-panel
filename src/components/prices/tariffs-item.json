@@ -2,12 +2,13 @@
   "collectionName": "components_prices_tariffs_items",
   "info": {
     "displayName": "TariffsItem",
-    "icon": "cast"
+    "icon": "cast",
+    "description": ""
   },
   "options": {},
   "attributes": {
     "TariffsItem": {
-      "type": "text"
+      "type": "string"
     }
   }
 }

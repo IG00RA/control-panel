@@ -386,20 +386,33 @@ export interface ApiConsumableConsumable extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
-    Consumable: Schema.Attribute.Component<'prices.consumables-item', false> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    key: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::consumable.consumable'
     >;
+    Name: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    Price: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -473,6 +486,7 @@ export interface ApiMainPageElementMainPageElement
 export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
   collectionName: 'tariffs';
   info: {
+    description: '';
     displayName: 'Tariffs';
     pluralName: 'tariffs';
     singularName: 'tariff';
@@ -491,10 +505,9 @@ export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     key: Schema.Attribute.String &
       Schema.Attribute.Required &
-      Schema.Attribute.Unique &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: true;
+          localized: false;
         };
       }>;
     locale: Schema.Attribute.String;
@@ -508,7 +521,7 @@ export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
     Price: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
-          localized: true;
+          localized: false;
         };
       }>;
     publishedAt: Schema.Attribute.DateTime;

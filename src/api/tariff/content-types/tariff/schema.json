@@ -4,7 +4,8 @@
   "info": {
     "singularName": "tariff",
     "pluralName": "tariffs",
-    "displayName": "Tariffs"
+    "displayName": "Tariffs",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -18,12 +19,12 @@
     "key": {
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
       "type": "string",
       "required": true,
-      "unique": true
+      "unique": false
     },
     "Name": {
       "pluginOptions": {
@@ -36,7 +37,7 @@
     "Price": {
       "pluginOptions": {
         "i18n": {
-          "localized": true
+          "localized": false
         }
       },
       "type": "string"

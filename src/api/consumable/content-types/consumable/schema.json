@@ -16,15 +16,30 @@
     }
   },
   "attributes": {
-    "Consumable": {
-      "type": "component",
-      "repeatable": false,
-      "component": "prices.consumables-item",
+    "key": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string",
+      "required": true
+    },
+    "Name": {
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "type": "string"
+    },
+    "Price": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
     }
   }
 }
