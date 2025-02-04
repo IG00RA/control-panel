@@ -1,5 +1,32 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface PricesConsumablesItem extends Struct.ComponentSchema {
+  collectionName: 'components_prices_consumables_items';
+  info: {
+    description: '';
+    displayName: 'ConsumablesItem';
+    icon: 'discuss';
+  };
+  attributes: {
+    key: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    Name: Schema.Attribute.String;
+    Price: Schema.Attribute.String;
+  };
+}
+
+export interface PricesTariffsItem extends Struct.ComponentSchema {
+  collectionName: 'components_prices_tariffs_items';
+  info: {
+    displayName: 'TariffsItem';
+    icon: 'cast';
+  };
+  attributes: {
+    TariffsItem: Schema.Attribute.Text;
+  };
+}
+
 export interface VacancyAdvantages extends Struct.ComponentSchema {
   collectionName: 'components_vacancy_advantages';
   info: {
@@ -62,6 +89,8 @@ export interface VacancySkill extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'prices.consumables-item': PricesConsumablesItem;
+      'prices.tariffs-item': PricesTariffsItem;
       'vacancy.advantages': VacancyAdvantages;
       'vacancy.requirements': VacancyRequirements;
       'vacancy.responsibilities-short': VacancyResponsibilitiesShort;

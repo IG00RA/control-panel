@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_prices_consumables_items",
+  "info": {
+    "displayName": "ConsumablesItem",
+    "icon": "discuss",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Price": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    }
+  }
+}

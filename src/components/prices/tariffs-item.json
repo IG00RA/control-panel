@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_prices_tariffs_items",
+  "info": {
+    "displayName": "TariffsItem",
+    "icon": "cast"
+  },
+  "options": {},
+  "attributes": {
+    "TariffsItem": {
+      "type": "text"
+    }
+  }
+}
