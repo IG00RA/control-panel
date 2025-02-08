@@ -4,7 +4,7 @@
   "info": {
     "singularName": "consumable",
     "pluralName": "consumables",
-    "displayName": "Consumables",
+    "displayName": "Consumables (Landings)",
     "description": ""
   },
   "options": {
@@ -48,20 +48,6 @@
         }
       },
       "type": "string"
-    },
-    "Displayed_price": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "enumeration",
-      "enum": [
-        "UAH",
-        "USD"
-      ],
-      "default": "UAH",
-      "required": true
     }
   }
 }

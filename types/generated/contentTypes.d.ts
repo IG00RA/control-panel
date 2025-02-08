@@ -373,7 +373,7 @@ export interface ApiConsumableConsumable extends Struct.CollectionTypeSchema {
   collectionName: 'consumables';
   info: {
     description: '';
-    displayName: 'Consumables';
+    displayName: 'Consumables (Landings)';
     pluralName: 'consumables';
     singularName: 'consumable';
   };
@@ -389,14 +389,6 @@ export interface ApiConsumableConsumable extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    Displayed_price: Schema.Attribute.Enumeration<['UAH', 'USD']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }> &
-      Schema.Attribute.DefaultTo<'UAH'>;
     key: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -434,12 +426,44 @@ export interface ApiConsumableConsumable extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiDisplayedPriceDisplayedPrice
+  extends Struct.SingleTypeSchema {
+  collectionName: 'displayed_prices';
+  info: {
+    description: '';
+    displayName: 'Displayed_price (Landings)';
+    pluralName: 'displayed-prices';
+    singularName: 'displayed-price';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Displayed_price: Schema.Attribute.Enumeration<['UAH', 'USD']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'UAH'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::displayed-price.displayed-price'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiMainPageElementMainPageElement
   extends Struct.CollectionTypeSchema {
   collectionName: 'main_page_elements';
   info: {
     description: '';
-    displayName: 'Main page elements';
+    displayName: 'Main page elements (Vacancy)';
     pluralName: 'main-page-elements';
     singularName: 'main-page-element';
   };
@@ -501,7 +525,7 @@ export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
   collectionName: 'tariffs';
   info: {
     description: '';
-    displayName: 'Tariffs';
+    displayName: 'Tariffs (Landings)';
     pluralName: 'tariffs';
     singularName: 'tariff';
   };
@@ -517,14 +541,6 @@ export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    Displayed_price: Schema.Attribute.Enumeration<['UAH', 'USD']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false;
-        };
-      }> &
-      Schema.Attribute.DefaultTo<'UAH'>;
     key: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1160,6 +1176,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::consumable.consumable': ApiConsumableConsumable;
+      'api::displayed-price.displayed-price': ApiDisplayedPriceDisplayedPrice;
       'api::main-page-element.main-page-element': ApiMainPageElementMainPageElement;
       'api::tariff.tariff': ApiTariffTariff;
       'api::vacancy.vacancy': ApiVacancyVacancy;

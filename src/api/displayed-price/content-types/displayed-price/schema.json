@@ -1,0 +1,25 @@
+{
+  "kind": "singleType",
+  "collectionName": "displayed_prices",
+  "info": {
+    "singularName": "displayed-price",
+    "pluralName": "displayed-prices",
+    "displayName": "Displayed_price (Landings)",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Displayed_price": {
+      "type": "enumeration",
+      "enum": [
+        "UAH",
+        "USD"
+      ],
+      "default": "UAH",
+      "required": true
+    }
+  }
+}

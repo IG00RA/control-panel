@@ -4,7 +4,7 @@
   "info": {
     "singularName": "tariff",
     "pluralName": "tariffs",
-    "displayName": "Tariffs",
+    "displayName": "Tariffs (Landings)",
     "description": ""
   },
   "options": {
@@ -52,20 +52,6 @@
         }
       },
       "component": "prices.tariffs-item"
-    },
-    "Displayed_price": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      },
-      "type": "enumeration",
-      "enum": [
-        "UAH",
-        "USD"
-      ],
-      "required": true,
-      "default": "UAH"
     },
     "Price_USD": {
       "pluginOptions": {
