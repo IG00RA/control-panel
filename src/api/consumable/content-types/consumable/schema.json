@@ -40,6 +40,28 @@
         }
       },
       "type": "string"
+    },
+    "Price_USD": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "string"
+    },
+    "Displayed_price": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      },
+      "type": "enumeration",
+      "enum": [
+        "UAH",
+        "USD"
+      ],
+      "default": "UAH",
+      "required": true
     }
   }
 }
