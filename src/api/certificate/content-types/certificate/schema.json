@@ -1,0 +1,65 @@
+{
+  "kind": "collectionType",
+  "collectionName": "certificates",
+  "info": {
+    "singularName": "certificate",
+    "pluralName": "certificates",
+    "displayName": "Certificate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "uuid": {
+      "type": "string",
+      "unique": true
+    },
+    "fullName": {
+      "type": "string"
+    },
+    "streamNumber": {
+      "type": "integer"
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "tariff": {
+      "type": "enumeration",
+      "enum": [
+        "free",
+        "start",
+        "base",
+        "pro"
+      ]
+    },
+    "grades": {
+      "type": "json"
+    },
+    "averageGradePoints": {
+      "type": "decimal"
+    },
+    "averageGradePercentages": {
+      "type": "decimal"
+    },
+    "recommendationsMentor": {
+      "type": "richtext"
+    },
+    "recommendationsCurator": {
+      "type": "richtext"
+    },
+    "videoReview": {
+      "type": "string"
+    },
+    "caseLink": {
+      "type": "string"
+    },
+    "pdfPath": {
+      "type": "string"
+    }
+  }
+}
