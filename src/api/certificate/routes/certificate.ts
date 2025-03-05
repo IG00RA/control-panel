@@ -1,7 +1,14 @@
-/**
- * certificate router
- */
-
-import { factories } from '@strapi/strapi';
-
-export default factories.createCoreRouter('api::certificate.certificate');
+module.exports = {
+  routes: [
+    {
+      method: "GET",
+      path: "/certificates/:id",
+      handler: "certificate.findOne",
+      config: {
+        policies: [],
+        middlewares: [],
+        auth: false,
+      },
+    },
+  ],
+};

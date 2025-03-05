@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import GenerateUuidButton from '../components/GenerateUuidButton';
 import FetchGrades from '../components/FetchGrades';
 import GeneratePdfButton from '../components/GeneratePdfButton';
+import QuillEditor from '../components/QuillEditor';
+import InputField from '../components/InputField';
+import TariffSelect from '../components/TariffSelect';
+import GenderSelect from '../components/GenderSelect'; // Імпортуємо новий компонент
+import StatusSelect from '../components/StatusSelect'; // Імпортуємо новий компонент
+import DatePickerField from '../components/DatePickerField';
 
-// Інтерфейс для пропсів
 interface HomePageProps {}
 
-// Інтерфейс для стану
+interface Lesson {
+  lesson: string;
+  tests: number[] | null;
+  homework: number[] | null;
+}
+
+interface Grades {
+  lessons: Lesson[];
+}
+
 interface CertificateData {
   uuid: string | null;
   fullName: string;
@@ -15,7 +29,7 @@ interface CertificateData {
   endDate: Date | null;
   tariff: string | null;
   telegramId: string;
-  grades: any;
+  grades: Grades | null;
   qrCode: string | null;
   averageGradePoints: number | null;
   averageGradePercentages: number | null;
@@ -24,6 +38,8 @@ interface CertificateData {
   videoReview: string;
   caseLink: string;
   pdfUrl: string | null;
+  gender: 'male' | 'female' | null; // Додано
+  certStatus: 'valid' | 'discontinued' | 'cancelled' | null; // Додано
 }
 
 const HomePage: React.FC<HomePageProps> = () => {
@@ -44,16 +60,18 @@ const HomePage: React.FC<HomePageProps> = () => {
     videoReview: '',
     caseLink: '',
     pdfUrl: null,
+    gender: null, // Ініціалізуємо gender
+    certStatus: null, // Ініціалізуємо certStatus
   });
 
-  // Функція для оновлення стану
-  const updateData = (key: keyof CertificateData, value: any) => {
+  const updateData = useCallback((key: keyof CertificateData, value: any) => {
     setData((prev) => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  // Стилі
   const styles = {
     main: {
+      maxWidth: '1200px',
+      margin: '0 auto',
       padding: '24px',
       backgroundColor: '#171723',
       minHeight: '100vh',
@@ -81,50 +99,16 @@ const HomePage: React.FC<HomePageProps> = () => {
       transition: 'all 0.3s ease',
       border: '1px solid #2e2e45',
     },
-    label: {
-      fontSize: '1.5rem',
-      fontWeight: 500,
-      color: '#fff',
-      marginBottom: '8px',
-      display: 'block',
-    },
-    input: {
+    editor: {
       width: '100%',
-      padding: '10px 12px',
       marginTop: '4px',
-      color: '#f8f8f9',
-      backgroundColor: 'rgb(24, 24, 38)',
-      border: '1px solid #383856',
-      borderRadius: '6px',
-      fontSize: '0.95rem',
-      transition: 'border-color 0.3s ease',
-      outline: 'none',
-    },
-    textarea: {
-      width: '100%',
-      padding: '10px 12px',
-      marginTop: '4px',
-      color: '#f8f8f9',
-      backgroundColor: 'rgb(24, 24, 38)',
-      border: '1px solid #383856',
-      borderRadius: '6px',
-      fontSize: '0.95rem',
-      minHeight: '120px',
-      transition: 'border-color 0.3s ease',
-      outline: 'none',
-      resize: 'vertical',
-    },
-    infoText: {
-      fontSize: '1.5rem',
-      color: '#a1a1b3',
-      margin: '10px 0',
     },
     dataDisplay: {
       backgroundColor: 'rgb(24, 24, 38)',
       padding: '10px',
       borderRadius: '6px',
       fontSize: '0.9rem',
-      overflowX: 'auto',
+      overflowX: 'auto' as const,
       color: '#a1a1b3',
       border: '1px solid #2e2e45',
       marginTop: '10px',
@@ -146,19 +130,12 @@ const HomePage: React.FC<HomePageProps> = () => {
       color: '#6b6bef',
       marginBottom: '4px',
     },
-    statLabel: {
-      fontSize: '0.9rem',
-      color: '#a1a1b3',
-      textAlign: 'center' as const,
-    },
-  };
-
-  // Стилі з фокусом для інпутів
-  const focusableInputStyle = {
-    ...styles.input,
-    ':focus': {
-      borderColor: '#6b6bef',
-      boxShadow: '0 0 0 2px rgba(107, 107, 239, 0.2)',
+    label: {
+      fontSize: '1.5rem',
+      fontWeight: 500,
+      color: 'rgb(255, 255, 255)',
+      marginBottom: '8px',
+      display: 'block',
     },
   };
 
@@ -166,7 +143,6 @@ const HomePage: React.FC<HomePageProps> = () => {
     <main style={styles.main}>
       <h1 style={styles.title}>Certificate Generator</h1>
       <div style={styles.grid}>
-        {/* UUID */}
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
           <GenerateUuidButton onUuidGenerated={(uuid: string) => updateData('uuid', uuid)} />
           {data.uuid && (
@@ -176,120 +152,145 @@ const HomePage: React.FC<HomePageProps> = () => {
           )}
         </div>
 
-        {/* Full Name */}
-        <div style={{ gridColumn: 'span 4', ...styles.card }}>
-          <label htmlFor="fullName" style={styles.label}>
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            value={data.fullName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('fullName', e.target.value)
-            }
-            placeholder="Enter full name"
-            style={focusableInputStyle}
-          />
-        </div>
+        <InputField
+          id="fullName"
+          label="Full Name"
+          value={data.fullName}
+          onChange={(value) => updateData('fullName', value)}
+          placeholder="Enter full name"
+          style={{ gridColumn: 'span 4', ...styles.card }}
+        />
 
-        {/* Tariff */}
-        <div style={{ gridColumn: 'span 4', ...styles.card }}>
-          <label htmlFor="tariff" style={styles.label}>
-            Tariff
-          </label>
-          <select
-            id="tariff"
-            value={data.tariff || ''}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              updateData('tariff', e.target.value || null)
-            }
-            style={focusableInputStyle}
-          >
-            <option value="">Select tariff</option>
-            <option value="free">Free</option>
-            <option value="start">Start</option>
-            <option value="base">Base</option>
-            <option value="pro">Pro</option>
-          </select>
-        </div>
+        <TariffSelect
+          value={data.tariff}
+          onChange={(value) => updateData('tariff', value)}
+          style={{ gridColumn: 'span 4', ...styles.card }}
+          labelStyle={styles.label}
+        />
 
-        {/* Stream Number */}
-        <div style={{ gridColumn: 'span 4', ...styles.card }}>
-          <label htmlFor="streamNumber" style={styles.label}>
-            Stream Number
-          </label>
-          <input
-            id="streamNumber"
-            type="number"
-            value={data.streamNumber || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('streamNumber', e.target.value ? parseInt(e.target.value) : null)
-            }
-            placeholder="Enter stream number"
-            style={focusableInputStyle}
-          />
-        </div>
+        <InputField
+          id="streamNumber"
+          label="Stream Number"
+          value={data.streamNumber}
+          onChange={(value) => updateData('streamNumber', value)}
+          placeholder="Enter stream number"
+          type="number"
+          style={{ gridColumn: 'span 4', ...styles.card }}
+        />
 
-        {/* Start Date */}
-        <div style={{ gridColumn: 'span 3', ...styles.card }}>
-          <label htmlFor="startDate" style={styles.label}>
-            Start Date
-          </label>
-          <input
-            id="startDate"
-            type="date"
-            value={data.startDate ? data.startDate.toISOString().split('T')[0] : ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('startDate', e.target.value ? new Date(e.target.value) : null)
-            }
-            style={focusableInputStyle}
-          />
-        </div>
+        <DatePickerField
+          id="startDate"
+          label="Start Date"
+          value={data.startDate}
+          onChange={(date) => updateData('startDate', date)}
+          style={{ gridColumn: 'span 3', ...styles.card }}
+          labelStyle={styles.label}
+        />
 
-        {/* End Date */}
-        <div style={{ gridColumn: 'span 3', ...styles.card }}>
-          <label htmlFor="endDate" style={styles.label}>
-            End Date
-          </label>
-          <input
-            id="endDate"
-            type="date"
-            value={data.endDate ? data.endDate.toISOString().split('T')[0] : ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('endDate', e.target.value ? new Date(e.target.value) : null)
-            }
-            style={focusableInputStyle}
-          />
-        </div>
+        <DatePickerField
+          id="endDate"
+          label="End Date"
+          value={data.endDate}
+          onChange={(date) => updateData('endDate', date)}
+          style={{ gridColumn: 'span 3', ...styles.card }}
+          labelStyle={styles.label}
+        />
 
-        {/* Grades */}
-        <div style={{ gridColumn: 'span 12', ...styles.card }}>
+        <GenderSelect
+          value={data.gender}
+          onChange={(value) => updateData('gender', value)}
+          style={{ gridColumn: 'span 3', ...styles.card }}
+          labelStyle={styles.label}
+        />
+        <StatusSelect
+          value={data.certStatus}
+          onChange={(value) => updateData('certStatus', value)}
+          style={{ gridColumn: 'span 3', ...styles.card }}
+          labelStyle={styles.label}
+        />
+
+        <div style={{ gridColumn: 'span 6', ...styles.card }}>
           <label htmlFor="telegramId" style={styles.label}>
             Telegram ID
           </label>
           <div style={{ display: 'flex', gap: '12px' }}>
             <FetchGrades
-              telegramId={data.telegramId}
               onGradesFetched={(grades: any) => {
-                updateData('grades', grades);
+                const lessons: Lesson[] = [
+                  { lesson: '0.1', tests: ['testN1'], homework: [] },
+                  { lesson: '1.1', tests: ['testN2'], homework: [] },
+                  { lesson: '1.2', tests: ['testN3'], homework: [] },
+                  { lesson: '1.3', tests: ['testN4'], homework: [] },
+                  { lesson: '1.4', tests: ['testN5'], homework: ['hN2'] },
+                  { lesson: '1.5', tests: ['testN7'], homework: ['hN29'] },
+                  { lesson: '2.1', tests: ['testN8'], homework: ['hN5'] },
+                  { lesson: '2.2', tests: ['testN9'], homework: ['hN7'] },
+                  { lesson: '2.3', tests: ['testN10'], homework: ['hN8'] },
+                  { lesson: '2.4', tests: ['testN11'], homework: ['hN9'] },
+                  { lesson: '2.5', tests: ['testN12'], homework: ['hN10'] },
+                  { lesson: '3.1', tests: ['testN13'], homework: [] },
+                  { lesson: '3.2', tests: ['testN14'], homework: ['hN11'] },
+                  { lesson: '3.3', tests: ['testN15'], homework: ['hN13'] },
+                  { lesson: '3.4', tests: ['testN16'], homework: ['hN12'] },
+                  { lesson: '4.1', tests: ['testN18'], homework: ['hN19'] },
+                  { lesson: '4.2', tests: ['testN19'], homework: ['hN20'] },
+                  { lesson: '4.3', tests: ['testN20'], homework: ['hN21', 'hN30'] },
+                  { lesson: '5.1', tests: [], homework: [] },
+                  { lesson: '5.2', tests: [], homework: ['hN14'] },
+                  { lesson: '5.3', tests: [], homework: [] },
+                  { lesson: '5.4', tests: [], homework: ['hN15'] },
+                  { lesson: '5.5', tests: ['testN17'], homework: ['hN16', 'hN17'] },
+                  { lesson: '6.1', tests: [], homework: ['hN22'] },
+                  { lesson: '6.2', tests: [], homework: ['hN23'] },
+                  { lesson: '6.3', tests: [], homework: ['hN24'] },
+                  { lesson: '6.4', tests: [], homework: ['hN25'] },
+                  { lesson: '6.5', tests: ['testN21'], homework: ['hN26'] },
+                  { lesson: '7.1', tests: ['testN22'], homework: ['hN28'] },
+                ].map(({ lesson, tests, homework }) => {
+                  const testValues = tests
+                    .map((key) => {
+                      const value = grades.tests[key];
+                      return value !== '' && typeof value === 'number'
+                        ? Math.round(value * 100)
+                        : null;
+                    })
+                    .filter((v): v is number => v !== null);
+
+                  const homeworkValues = homework
+                    .map((key) => {
+                      const value = grades.homework[key];
+                      return value !== '' && typeof value === 'number' ? Math.round(value) : null;
+                    })
+                    .filter((v): v is number => v !== null);
+
+                  return {
+                    lesson,
+                    tests: testValues.length > 0 ? testValues : null,
+                    homework: homeworkValues.length > 0 ? homeworkValues : null,
+                  };
+                });
+
+                updateData('grades', { lessons });
+
                 if (grades) {
-                  // Обчислення середнього для homework (12-бальна система)
-                  const homeworkGrades = Object.values(grades.homework).filter(
-                    (grade): grade is number => typeof grade === 'number'
-                  );
+                  const homeworkGrades = Object.entries(grades.homework)
+                    .filter(([key, value]) => key.startsWith('hN') && typeof value === 'number')
+                    .map(([, value]) => value as number);
+
                   const avgPoints =
                     homeworkGrades.length > 0
-                      ? Math.round(
-                          homeworkGrades.reduce((a, b) => a + b, 0) / homeworkGrades.length
+                      ? parseFloat(
+                          (
+                            homeworkGrades.reduce((a, b) => a + b, 0) / homeworkGrades.length
+                          ).toFixed(1)
                         )
                       : null;
                   updateData('averageGradePoints', avgPoints);
 
-                  // Обчислення середнього для tests (відсотки)
-                  const testGrades = Object.values(grades.tests).filter(
-                    (grade): grade is number => typeof grade === 'number'
-                  );
+                  const testGrades = Object.entries(grades.tests)
+                    .filter(([key, value]) => key.startsWith('testN') && typeof value === 'number')
+                    .map(([, value]) => value as number);
+
                   const avgPercentages =
                     testGrades.length > 0
                       ? Math.round(
@@ -301,101 +302,126 @@ const HomePage: React.FC<HomePageProps> = () => {
               }}
             />
           </div>
-
           {data.grades && (
             <div style={styles.dataDisplay}>
-              <strong>Grades:</strong> <pre>{JSON.stringify(data.grades, null, 2)}</pre>
+              <strong>Grades:</strong>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '20px',
+                  marginTop: '10px',
+                }}
+              >
+                <div>
+                  {data.grades.lessons.slice(0, 15).map(({ lesson, tests, homework }: Lesson) => {
+                    const testDisplay = tests ? tests.map((v) => `${v}%`).join(', ') : '-';
+                    const homeworkDisplay = homework ? homework.join(', ') : '-';
+                    const content =
+                      testDisplay === '-' && homeworkDisplay === '-'
+                        ? '-'
+                        : `${testDisplay === '-' ? '' : testDisplay}${
+                            testDisplay !== '-' && homeworkDisplay !== '-' ? ' - ' : ''
+                          }${homeworkDisplay === '-' ? '' : homeworkDisplay}`;
+
+                    return (
+                      <div key={lesson}>
+                        <span style={{ color: '#fff', fontWeight: 'bold' }}>
+                          lesson {lesson} -{' '}
+                        </span>
+                        <span style={{ color: '#a1a1b3' }}>{content}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div>
+                  {data.grades.lessons.slice(15).map(({ lesson, tests, homework }: Lesson) => {
+                    const testDisplay = tests ? tests.map((v) => `${v}%`).join(', ') : '-';
+                    const homeworkDisplay = homework ? homework.join(', ') : '-';
+                    const content =
+                      testDisplay === '-' && homeworkDisplay === '-'
+                        ? '-'
+                        : `${testDisplay === '-' ? '' : testDisplay}${
+                            testDisplay !== '-' && homeworkDisplay !== '-' ? ' - ' : ''
+                          }${homeworkDisplay === '-' ? '' : homeworkDisplay}`;
+
+                    return (
+                      <div key={lesson}>
+                        <span style={{ color: '#fff', fontWeight: 'bold' }}>
+                          lesson {lesson} -{' '}
+                        </span>
+                        <span style={{ color: '#a1a1b3' }}>{content}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Average Grade Points */}
-        <div style={{ gridColumn: 'span 6', ...styles.card }}>
+        <div style={{ gridColumn: 'span 3', ...styles.card }}>
           <div style={styles.statCard}>
             <div style={styles.statValue}>{data.averageGradePoints ?? '-'}</div>
-            <div style={styles.statLabel}>Average Grade Points</div>
+            <div style={styles.label}>Average Grade Points</div>
           </div>
         </div>
 
-        {/* Average Grade Percentages */}
-        <div style={{ gridColumn: 'span 6', ...styles.card }}>
+        <div style={{ gridColumn: 'span 3', ...styles.card }}>
           <div style={styles.statCard}>
             <div style={styles.statValue}>
-              {data.averageGradePercentages ? `${data.averageGradePercentages}%` : '-'}
+              {data.averageGradePoints ? `${data.averageGradePercentages}%` : '-'}
             </div>
-            <div style={styles.statLabel}>Average Grade Percentages</div>
+            <div style={styles.label}>Average Grade Percentages</div>
           </div>
         </div>
 
-        {/* Recommendations Mentor */}
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
           <label htmlFor="recommendationsMentor" style={styles.label}>
             Recommendations from Mentor
           </label>
-          <textarea
-            id="recommendationsMentor"
-            value={data.recommendationsMentor}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              updateData('recommendationsMentor', e.target.value)
-            }
-            placeholder="Enter mentor recommendations"
-            style={styles.textarea}
-          />
+          <div style={styles.editor}>
+            <QuillEditor
+              value={data.recommendationsMentor}
+              onChange={(content: string) => updateData('recommendationsMentor', content)}
+            />
+          </div>
         </div>
 
-        {/* Recommendations Curator */}
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
           <label htmlFor="recommendationsCurator" style={styles.label}>
             Recommendations from Curator
           </label>
-          <textarea
-            id="recommendationsCurator"
-            value={data.recommendationsCurator}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              updateData('recommendationsCurator', e.target.value)
-            }
-            placeholder="Enter curator recommendations"
-            style={styles.textarea}
-          />
+          <div style={styles.editor}>
+            <QuillEditor
+              value={data.recommendationsCurator}
+              onChange={(content: string) => updateData('recommendationsCurator', content)}
+            />
+          </div>
         </div>
 
-        {/* Video Review */}
-        <div style={{ gridColumn: 'span 6', ...styles.card }}>
-          <label htmlFor="videoReview" style={styles.label}>
-            Video Review Link
-          </label>
-          <input
-            id="videoReview"
-            type="text"
-            value={data.videoReview}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('videoReview', e.target.value)
-            }
-            placeholder="Enter video review link"
-            style={focusableInputStyle}
-          />
-        </div>
+        <InputField
+          id="videoReview"
+          label="Video Review Link"
+          value={data.videoReview}
+          onChange={(value) => updateData('videoReview', value)}
+          placeholder="Enter video review link"
+          style={{ gridColumn: 'span 6', ...styles.card }}
+        />
 
-        {/* Case Link */}
-        <div style={{ gridColumn: 'span 6', ...styles.card }}>
-          <label htmlFor="caseLink" style={styles.label}>
-            Case Link
-          </label>
-          <input
-            id="caseLink"
-            type="text"
-            value={data.caseLink}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateData('caseLink', e.target.value)
-            }
-            placeholder="Enter case link"
-            style={focusableInputStyle}
-          />
-        </div>
-
-        {/* PDF Generation */}
+        <InputField
+          id="caseLink"
+          label="Case Link"
+          value={data.caseLink}
+          onChange={(value) => updateData('caseLink', value)}
+          placeholder="Enter case link"
+          style={{ gridColumn: 'span 6', ...styles.card }}
+        />
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
-          <GeneratePdfButton id="1" onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)} />
+          <GeneratePdfButton
+            certificateData={data}
+            onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
+          />
           {data.pdfUrl && (
             <div style={styles.dataDisplay}>
               <strong>Generated PDF:</strong> {data.pdfUrl}

@@ -378,17 +378,22 @@ export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
     singularName: 'certificate';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     averageGradePercentages: Schema.Attribute.Decimal;
     averageGradePoints: Schema.Attribute.Decimal;
     caseLink: Schema.Attribute.String;
+    certStatus: Schema.Attribute.Enumeration<
+      ['valid', 'discontinued', 'cancelled']
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     endDate: Schema.Attribute.Date;
     fullName: Schema.Attribute.String;
+    gender: Schema.Attribute.Enumeration<['male', 'female']> &
+      Schema.Attribute.DefaultTo<'male'>;
     grades: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -406,7 +411,9 @@ export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    uuid: Schema.Attribute.String & Schema.Attribute.Unique;
+    uuid: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     videoReview: Schema.Attribute.String;
   };
 }

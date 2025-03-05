@@ -8,13 +8,14 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
     "uuid": {
       "type": "string",
-      "unique": true
+      "unique": true,
+      "required": true
     },
     "fullName": {
       "type": "string"
@@ -35,6 +36,22 @@
         "start",
         "base",
         "pro"
+      ]
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": [
+        "male",
+        "female"
+      ],
+      "default": "male"
+    },
+    "certStatus": {
+      "type": "enumeration",
+      "enum": [
+        "valid",
+        "discontinued",
+        "cancelled"
       ]
     },
     "grades": {

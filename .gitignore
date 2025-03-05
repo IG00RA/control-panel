@@ -47,6 +47,8 @@ web_modules/
 
 private/
 
+public/
+
 # TypeScript cache
 *.tsbuildinfo
 

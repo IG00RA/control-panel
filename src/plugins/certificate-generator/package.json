@@ -31,9 +31,13 @@
     "test:ts:back": "run -T tsc -p server/tsconfig.json"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.2.1",
     "@strapi/design-system": "^2.0.0-rc.18",
     "@strapi/icons": "^2.0.0-rc.18",
-    "react-intl": "^7.1.6"
+    "quill": "^2.0.3",
+    "react-intl": "^7.1.6",
+    "slate": "^0.112.0",
+    "slate-react": "^0.112.1"
   },
   "devDependencies": {
     "@strapi/sdk-plugin": "^5.3.2",

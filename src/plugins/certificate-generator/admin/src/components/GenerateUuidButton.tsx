@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@strapi/design-system';
 
 interface GenerateUuidButtonProps {
@@ -6,13 +6,28 @@ interface GenerateUuidButtonProps {
 }
 
 const GenerateUuidButton: React.FC<GenerateUuidButtonProps> = ({ onUuidGenerated }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
+
   const handleClick = async () => {
-    const res = await fetch('/certificate-generator/generate-uuid');
-    const data = await res.json();
-    onUuidGenerated(data.uuid);
+    setIsLoading(true);
+    try {
+      const res = await fetch('/certificate-generator/generate-uuid');
+      const data = await res.json();
+      onUuidGenerated(data.uuid);
+      setIsGenerated(true); // Вимикаємо кнопку після успішної генерації
+    } catch (error) {
+      console.error('Error generating UUID:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return <Button onClick={handleClick}>Generate UUID</Button>;
+  return (
+    <Button onClick={handleClick} disabled={isLoading || isGenerated}>
+      {isLoading ? 'Generating...' : isGenerated ? 'UUID Generated' : 'Generate UUID'}
+    </Button>
+  );
 };
 
 export default GenerateUuidButton;
