@@ -1,7 +1,5 @@
-import QRCode from 'qrcode';
 import axios from 'axios';
 import { generateCertificateHtml } from './generateCertificateHtml';
-import path from 'path';
 
 interface StrapiContext {
   request: {
@@ -36,8 +34,6 @@ interface CertificateInput {
   gender?: 'male' | 'female' | null;
   certStatus?: 'valid' | 'discontinued' | 'cancelled' | null;
 }
-
-type CertificateUpdateInput = Omit<CertificateInput, 'uuid'>;
 
 export default {
   async generateUuid(ctx: StrapiContext) {
@@ -92,25 +88,9 @@ export default {
     }
   },
 
-  async generateQrCode(ctx: StrapiContext) {
-    const { uuid } = ctx.request.body;
-    const url = `https://mustage.team/uk/${uuid}`;
-    const qrCodePath = path.resolve(__dirname, `../../../public/uploads/qr_${uuid}.png`);
-    try {
-      await QRCode.toFile(qrCodePath, url);
-      const qrCodeUrl = `/uploads/qr_${uuid}.png`;
-      return ctx.send({ qrCode: qrCodeUrl });
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Failed to generate QR code' };
-      return;
-    }
-  },
   async create(ctx: StrapiContext) {
     const data = ctx.request.body.data as CertificateInput;
     try {
-      // Зберігаємо дані напряму, без виклику calculateAverages
       const certificate = await strapi.entityService.create('api::certificate.certificate', {
         data: { ...data },
       });
@@ -129,28 +109,29 @@ export default {
     try {
       const htmlContent = generateCertificateHtml(certificateData);
 
-      // Make sure puppeteer is properly imported only on the server side
       const puppeteer = require('puppeteer');
 
       const browser = await puppeteer.launch({
-        headless: 'new', // Use the new headless mode
+        headless: 'new',
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
 
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-      const pdfPath = `./public/uploads/cert_${certificateData.uuid}.pdf`;
+      const pdfPath = `./public/uploads/Certificate_${certificateData.uuid}.pdf`;
       await page.pdf({
         path: pdfPath,
         width: '842px',
         height: '595px',
         printBackground: true,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+        scale: 1.5,
       });
 
       await browser.close();
 
-      const pdfUrl = `/uploads/cert_${certificateData.uuid}.pdf`;
+      const pdfUrl = `/uploads/Certificate_${certificateData.uuid}.pdf`;
       return ctx.send({ pdfUrl });
     } catch (error) {
       console.error('Error generating PDF:', error);

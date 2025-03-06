@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@strapi/design-system';
 import { CertificateData } from 'src/pages/HomePage';
 
@@ -11,7 +11,10 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
   certificateData,
   onPdfGenerated,
 }) => {
+  const [isLoading, setIsLoading] = useState(false); // Додаємо стан завантаження
+
   const handleGeneratePdf = async () => {
+    setIsLoading(true); // Встановлюємо стан "завантаження" перед початком запитів
     try {
       const response = await fetch('/certificate-generator/generate-pdf', {
         method: 'POST',
@@ -42,10 +45,16 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
       onPdfGenerated(pdfUrl);
     } catch (error) {
       console.error('Error generating or saving PDF:', error);
+    } finally {
+      setIsLoading(false); // Скидаємо стан "завантаження" після завершення (успіх чи помилка)
     }
   };
 
-  return <Button onClick={handleGeneratePdf}>Generate PDF</Button>;
+  return (
+    <Button onClick={handleGeneratePdf} disabled={isLoading}>
+      {isLoading ? 'Generating...' : 'Generate PDF'}
+    </Button>
+  );
 };
 
 export default GeneratePdfButton;

@@ -18,7 +18,7 @@ const TariffSelect: React.FC<TariffSelectProps> = React.memo(
 
     const handleChange = (value: string | undefined) => {
       setLocalValue(value);
-      onChange(value || null); // Передаємо значення одразу після вибору
+      onChange(value || null); 
     };
 
     return (

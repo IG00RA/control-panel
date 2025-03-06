@@ -1,13 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import GenerateUuidButton from '../components/GenerateUuidButton';
 import FetchGrades from '../components/FetchGrades';
 import GeneratePdfButton from '../components/GeneratePdfButton';
 import QuillEditor from '../components/QuillEditor';
 import InputField from '../components/InputField';
 import TariffSelect from '../components/TariffSelect';
-import GenderSelect from '../components/GenderSelect'; // Імпортуємо новий компонент
-import StatusSelect from '../components/StatusSelect'; // Імпортуємо новий компонент
+import GenderSelect from '../components/GenderSelect';
+import StatusSelect from '../components/StatusSelect';
 import DatePickerField from '../components/DatePickerField';
+import { Button } from '@strapi/design-system'; // Додаємо імпорт Button
 
 interface HomePageProps {}
 
@@ -38,8 +39,8 @@ export interface CertificateData {
   videoReview: string;
   caseLink: string;
   pdfUrl: string | null;
-  gender: 'male' | 'female' | null; // Додано
-  certStatus: 'valid' | 'discontinued' | 'cancelled' | null; // Додано
+  gender: 'male' | 'female' | null;
+  certStatus: 'valid' | 'discontinued' | 'cancelled' | null;
 }
 
 const HomePage: React.FC<HomePageProps> = () => {
@@ -60,13 +61,45 @@ const HomePage: React.FC<HomePageProps> = () => {
     videoReview: '',
     caseLink: '',
     pdfUrl: null,
-    gender: null, // Ініціалізуємо gender
-    certStatus: null, // Ініціалізуємо certStatus
+    gender: 'male',
+    certStatus: 'valid',
   });
+
+  const fetchGradesResetRef = useRef<(() => void) | null>(null);
+  const generateUuidResetRef = useRef<(() => void) | null>(null);
 
   const updateData = useCallback((key: keyof CertificateData, value: any) => {
     setData((prev) => ({ ...prev, [key]: value }));
   }, []);
+
+  const resetForm = () => {
+    setData({
+      uuid: null,
+      fullName: '',
+      streamNumber: null,
+      startDate: null,
+      endDate: null,
+      tariff: null,
+      telegramId: '',
+      grades: null,
+      qrCode: null,
+      averageGradePoints: null,
+      averageGradePercentages: null,
+      recommendationsMentor: '',
+      recommendationsCurator: '',
+      videoReview: '',
+      caseLink: '',
+      pdfUrl: null,
+      gender: 'male',
+      certStatus: 'valid',
+    });
+    if (fetchGradesResetRef.current) {
+      fetchGradesResetRef.current(); // Скидаємо FetchGrades
+    }
+    if (generateUuidResetRef.current) {
+      generateUuidResetRef.current(); // Скидаємо GenerateUuidButton
+    }
+  };
 
   const styles = {
     main: {
@@ -137,6 +170,11 @@ const HomePage: React.FC<HomePageProps> = () => {
       marginBottom: '8px',
       display: 'block',
     },
+    buttonContainer: {
+      // Стиль для контейнера кнопок
+      display: 'flex',
+      gap: '12px',
+    },
   };
 
   return (
@@ -144,7 +182,10 @@ const HomePage: React.FC<HomePageProps> = () => {
       <h1 style={styles.title}>Certificate Generator</h1>
       <div style={styles.grid}>
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
-          <GenerateUuidButton onUuidGenerated={(uuid: string) => updateData('uuid', uuid)} />
+          <GenerateUuidButton
+            onUuidGenerated={(uuid: string) => updateData('uuid', uuid)}
+            onReset={(resetFn) => (generateUuidResetRef.current = resetFn)} // Передаємо функцію скидання
+          />
           {data.uuid && (
             <div style={styles.dataDisplay}>
               <strong>Generated UUID:</strong> {data.uuid}
@@ -300,6 +341,7 @@ const HomePage: React.FC<HomePageProps> = () => {
                   updateData('averageGradePercentages', avgPercentages);
                 }
               }}
+              onReset={(resetFn) => (fetchGradesResetRef.current = resetFn)} // Передаємо функцію скидання
             />
           </div>
           {data.grades && (
@@ -417,11 +459,17 @@ const HomePage: React.FC<HomePageProps> = () => {
           placeholder="Enter case link"
           style={{ gridColumn: 'span 6', ...styles.card }}
         />
+
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
-          <GeneratePdfButton
-            certificateData={data}
-            onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
-          />
+          <div style={styles.buttonContainer}>
+            <GeneratePdfButton
+              certificateData={data}
+              onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
+            />
+            <Button variant="secondary" onClick={resetForm}>
+              Reset Form
+            </Button>
+          </div>
           {data.pdfUrl && (
             <div style={styles.dataDisplay}>
               <strong>Generated PDF:</strong> {data.pdfUrl}

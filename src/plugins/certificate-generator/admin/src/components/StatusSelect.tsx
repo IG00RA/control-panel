@@ -10,12 +10,13 @@ interface StatusSelectProps {
 
 const StatusSelect: React.FC<StatusSelectProps> = React.memo(
   ({ value: initialValue, onChange, style, labelStyle }) => {
+    // Змінюємо початкове значення з undefined на 'valid'
     const [localValue, setLocalValue] = useState<
       'valid' | 'discontinued' | 'cancelled' | undefined
-    >(initialValue || undefined);
+    >(initialValue || 'valid');
 
     useEffect(() => {
-      setLocalValue(initialValue || undefined);
+      setLocalValue(initialValue || 'valid');
     }, [initialValue]);
 
     const handleChange = (value: 'valid' | 'discontinued' | 'cancelled' | undefined) => {

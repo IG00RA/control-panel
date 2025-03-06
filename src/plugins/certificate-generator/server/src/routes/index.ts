@@ -19,15 +19,6 @@ export default [
   },
   {
     method: 'POST',
-    path: '/generate-qr',
-    handler: 'certificate.generateQrCode',
-    config: {
-      policies: [],
-      auth: false,
-    },
-  },
-  {
-    method: 'POST',
     path: '/create',
     handler: 'certificate.create',
     config: {

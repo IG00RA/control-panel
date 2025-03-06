@@ -11,11 +11,11 @@ interface GenderSelectProps {
 const GenderSelect: React.FC<GenderSelectProps> = React.memo(
   ({ value: initialValue, onChange, style, labelStyle }) => {
     const [localValue, setLocalValue] = useState<'male' | 'female' | undefined>(
-      initialValue || undefined
+      initialValue || 'male'
     );
 
     useEffect(() => {
-      setLocalValue(initialValue || undefined);
+      setLocalValue(initialValue || 'male');
     }, [initialValue]);
 
     const handleChange = (value: 'male' | 'female' | undefined) => {

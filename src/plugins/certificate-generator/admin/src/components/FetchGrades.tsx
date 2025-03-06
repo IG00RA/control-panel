@@ -1,13 +1,20 @@
+// FetchGrades.tsx
 import React, { useState } from 'react';
 import { TextInput, Button } from '@strapi/design-system';
 
 interface FetchGradesProps {
   onGradesFetched: (grades: any) => void;
+  onReset?: (resetFn: () => void) => void; // Змінено тип, щоб приймати функцію
 }
 
-const FetchGrades: React.FC<FetchGradesProps> = ({ onGradesFetched }) => {
+const FetchGrades: React.FC<FetchGradesProps> = ({ onGradesFetched, onReset }) => {
   const [telegramId, setTelegramId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const resetState = () => {
+    setTelegramId('');
+    setIsLoading(false);
+  };
 
   const handleFetch = async () => {
     setIsLoading(true);
@@ -25,6 +32,12 @@ const FetchGrades: React.FC<FetchGradesProps> = ({ onGradesFetched }) => {
       setIsLoading(false);
     }
   };
+
+  React.useEffect(() => {
+    if (onReset) {
+      onReset(resetState); // Передаємо функцію resetState
+    }
+  }, [onReset]);
 
   return (
     <>
