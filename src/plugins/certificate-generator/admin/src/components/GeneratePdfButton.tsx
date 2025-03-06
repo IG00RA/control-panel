@@ -1,76 +1,51 @@
-import React, { useState } from 'react';
-import { Button, Typography } from '@strapi/design-system';
+import React from 'react';
+import { Button } from '@strapi/design-system';
+import { CertificateData } from 'src/pages/HomePage';
 
 interface GeneratePdfButtonProps {
-  certificateData: {
-    uuid: string | null;
-    fullName: string;
-    streamNumber: number | null;
-    startDate: Date | null;
-    endDate: Date | null;
-    tariff: string | null;
-    telegramId: string;
-    grades: any;
-    qrCode: string | null;
-    averageGradePoints: number | null;
-    averageGradePercentages: number | null;
-    recommendationsMentor: string;
-    recommendationsCurator: string;
-    videoReview: string;
-    caseLink: string;
-    pdfUrl: string | null;
-  };
-  onPdfGenerated?: (pdfUrl: string) => void;
+  certificateData: CertificateData;
+  onPdfGenerated: (pdfUrl: string) => void;
 }
 
 const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
   certificateData,
   onPdfGenerated,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGenerated, setIsGenerated] = useState(false);
-
-  const handleGenerate = async () => {
-    if (!certificateData.uuid) {
-      console.error('UUID is required to generate PDF');
-      return;
-    }
-    const formatDate = (date: Date | null) => (date ? date.toISOString().split('T')[0] : null);
-
-    // У GeneratePdfButton перед fetch:
-    const formattedData = {
-      ...certificateData,
-      startDate: formatDate(certificateData.startDate),
-      endDate: formatDate(certificateData.endDate),
-    };
-
-    setIsLoading(true);
+  const handleGeneratePdf = async () => {
     try {
-      const res = await fetch(`/certificate-generator/generate-pdf/${formattedData.uuid}`, {
+      const response = await fetch('/certificate-generator/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(certificateData),
       });
-      const data = await res.json();
-      setIsGenerated(true);
-      if (onPdfGenerated) {
-        onPdfGenerated(data.pdfPath);
-      }
+
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      const { pdfUrl } = await response.json();
+
+      // Зберігаємо дані в базі через ендпоінт create
+      const formattedData = {
+        ...certificateData,
+        startDate: certificateData.startDate?.toISOString().split('T')[0] || null,
+        endDate: certificateData.endDate?.toISOString().split('T')[0] || null,
+        pdfPath: pdfUrl,
+      };
+
+      const createResponse = await fetch('/certificate-generator/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: formattedData }),
+      });
+
+      if (!createResponse.ok) throw new Error('Failed to save certificate data');
+      await createResponse.json();
+
+      onPdfGenerated(pdfUrl);
     } catch (error) {
-      setIsGenerated(false);
-      console.error('Error generating PDF:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error generating or saving PDF:', error);
     }
   };
 
-  return (
-    <>
-      <Button onClick={handleGenerate} disabled={isLoading || isGenerated || !certificateData.uuid}>
-        {isLoading ? 'Generating...' : isGenerated ? 'PDF Generated' : 'Generate PDF'}
-      </Button>
-    </>
-  );
+  return <Button onClick={handleGeneratePdf}>Generate PDF</Button>;
 };
 
 export default GeneratePdfButton;

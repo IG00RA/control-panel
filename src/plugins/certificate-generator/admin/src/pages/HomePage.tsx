@@ -21,7 +21,7 @@ interface Grades {
   lessons: Lesson[];
 }
 
-interface CertificateData {
+export interface CertificateData {
   uuid: string | null;
   fullName: string;
   streamNumber: number | null;

@@ -1,9 +1,8 @@
 import QRCode from 'qrcode';
-import PDFDocument from 'pdfkit';
-import { createWriteStream } from 'fs';
 import axios from 'axios';
+import { generateCertificateHtml } from './generateCertificateHtml';
+import path from 'path';
 
-// Інтерфейс для типізації контексту Strapi
 interface StrapiContext {
   request: {
     body: any;
@@ -18,7 +17,6 @@ interface StrapiContext {
   };
 }
 
-// Оновлений інтерфейс для вхідних даних сертифіката
 interface CertificateInput {
   uuid?: string;
   fullName: string;
@@ -39,7 +37,6 @@ interface CertificateInput {
   certStatus?: 'valid' | 'discontinued' | 'cancelled' | null;
 }
 
-// Тип для оновлення, який виключає uuid
 type CertificateUpdateInput = Omit<CertificateInput, 'uuid'>;
 
 export default {
@@ -98,7 +95,7 @@ export default {
   async generateQrCode(ctx: StrapiContext) {
     const { uuid } = ctx.request.body;
     const url = `https://mustage.team/uk/${uuid}`;
-    const qrCodePath = `./public/uploads/qr_${uuid}.png`;
+    const qrCodePath = path.resolve(__dirname, `../../../public/uploads/qr_${uuid}.png`);
     try {
       await QRCode.toFile(qrCodePath, url);
       const qrCodeUrl = `/uploads/qr_${uuid}.png`;
@@ -110,138 +107,12 @@ export default {
       return;
     }
   },
-
-  async generatePdf(ctx: StrapiContext) {
-    const uuid = ctx.params.id; // Отримуємо uuid з URL
-    const certificateData = ctx.request.body as CertificateInput;
-
-    // Перевіряємо, чи є запис з таким uuid
-    let certificate;
-    try {
-      const existingCertificates = await strapi.entityService.findMany(
-        'api::certificate.certificate',
-        {
-          filters: { uuid },
-        }
-      );
-      certificate = existingCertificates[0]; // Беремо перший запис, якщо є
-
-      const certificateInput: CertificateUpdateInput = {
-        fullName: certificateData.fullName,
-        streamNumber: certificateData.streamNumber,
-        startDate: certificateData.startDate,
-        endDate: certificateData.endDate,
-        tariff: certificateData.tariff,
-        grades: certificateData.grades,
-        averageGradePoints: certificateData.averageGradePoints,
-        averageGradePercentages: certificateData.averageGradePercentages,
-        recommendationsMentor: certificateData.recommendationsMentor,
-        recommendationsCurator: certificateData.recommendationsCurator,
-        videoReview: certificateData.videoReview,
-        qrCode: certificateData.qrCode,
-        caseLink: certificateData.caseLink,
-        pdfPath: certificateData.pdfPath,
-        gender: certificateData.gender,
-        certStatus: certificateData.certStatus,
-      };
-
-      if (certificate) {
-        certificate = await strapi.entityService.update(
-          'api::certificate.certificate',
-          certificate.id,
-          {
-            data: certificateInput as any,
-          }
-        );
-      } else {
-        certificate = await strapi.entityService.create('api::certificate.certificate', {
-          data: {
-            ...certificateInput,
-            uuid: certificateData.uuid,
-          } as any,
-        });
-      }
-    } catch (error) {
-      console.error('Error saving certificate data:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Error saving certificate data' };
-      return;
-    }
-
-    // Генерація PDF
-    const pdfPath = `./public/uploads/cert_${certificate.uuid}.pdf`;
-    const doc = new PDFDocument({ size: 'A4' });
-    doc.font('Helvetica');
-
-    const writeStream = createWriteStream(pdfPath);
-    doc.pipe(writeStream);
-
-    try {
-      await new Promise<void>((resolve, reject) => {
-        writeStream.on('finish', resolve);
-        writeStream.on('error', reject);
-
-        doc.fontSize(16).text(`Certificate for ${certificate.fullName || 'N/A'}`, 100, 100);
-        doc.fontSize(12).text(`Stream: ${certificate.streamNumber || 'N/A'}`, 100, 120);
-        doc.text(`Tariff: ${certificate.tariff || 'N/A'}`, 100, 140);
-        doc.text(
-          `Period: ${certificate.startDate || 'N/A'} - ${certificate.endDate || 'N/A'}`,
-          100,
-          160
-        );
-        doc.text(`Gender: ${certificate.gender || 'N/A'}`, 100, 180);
-        doc.text(`Status: ${certificate.certStatus || 'N/A'}`, 100, 200);
-        doc.text(`Average Points: ${certificate.averageGradePoints || 'N/A'}`, 100, 220);
-        doc.text(`Average Percentage: ${certificate.averageGradePercentages || 'N/A'}%`, 100, 240);
-        doc.text(
-          `Mentor Recommendations: ${certificate.recommendationsMentor || 'N/A'}`,
-          100,
-          260,
-          { width: 400 }
-        );
-        doc.text(
-          `Curator Recommendations: ${certificate.recommendationsCurator || 'N/A'}`,
-          100,
-          340,
-          { width: 400 }
-        );
-        doc.text(`Video Review: ${certificate.videoReview || 'N/A'}`, 100, 420);
-        doc.text(`Case Link: ${certificate.caseLink || 'N/A'}`, 100, 440);
-
-        if (certificate.qrCode) {
-          doc.image(`./public${certificate.qrCode}`, 400, 100, { width: 100 });
-        }
-
-        doc.end();
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Error generating PDF' };
-      return;
-    }
-
-    const pdfUrl = `/uploads/cert_${certificate.uuid}.pdf`;
-    try {
-      await strapi.entityService.update('api::certificate.certificate', certificate.id, {
-        data: { pdfPath: pdfUrl } as any,
-      });
-    } catch (error) {
-      console.error('Error updating certificate with PDF path:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Error updating certificate with PDF path' };
-      return;
-    }
-
-    return ctx.send({ pdfPath: pdfUrl });
-  },
-
   async create(ctx: StrapiContext) {
     const data = ctx.request.body.data as CertificateInput;
     try {
-      const averages = await strapi.service('api::certificate.certificate').calculateAverages(data);
+      // Зберігаємо дані напряму, без виклику calculateAverages
       const certificate = await strapi.entityService.create('api::certificate.certificate', {
-        data: { ...data, ...averages } as any,
+        data: { ...data },
       });
       return ctx.send(certificate);
     } catch (error) {
@@ -249,6 +120,42 @@ export default {
       ctx.response.status = 500;
       ctx.response.body = { error: 'Error creating certificate' };
       return;
+    }
+  },
+
+  async generatePdf(ctx) {
+    const certificateData = ctx.request.body;
+
+    try {
+      const htmlContent = generateCertificateHtml(certificateData);
+
+      // Make sure puppeteer is properly imported only on the server side
+      const puppeteer = require('puppeteer');
+
+      const browser = await puppeteer.launch({
+        headless: 'new', // Use the new headless mode
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+      const pdfPath = `./public/uploads/cert_${certificateData.uuid}.pdf`;
+      await page.pdf({
+        path: pdfPath,
+        width: '842px',
+        height: '595px',
+        printBackground: true,
+      });
+
+      await browser.close();
+
+      const pdfUrl = `/uploads/cert_${certificateData.uuid}.pdf`;
+      return ctx.send({ pdfUrl });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      ctx.response.status = 500;
+      return ctx.send({ error: 'Failed to generate PDF' });
     }
   },
 };

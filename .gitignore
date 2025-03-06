@@ -47,7 +47,7 @@ web_modules/
 
 private/
 
-public/
+public/uploads/
 
 # TypeScript cache
 *.tsbuildinfo
