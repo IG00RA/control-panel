@@ -39,7 +39,7 @@ const GenerateUuidButton: React.FC<GenerateUuidButtonProps> = ({ onUuidGenerated
 
   return (
     <Button onClick={handleClick} disabled={isLoading || isGenerated}>
-      {isLoading ? 'Generating...' : isGenerated ? 'UUID Generated' : 'Generate UUID'}
+      {isLoading ? 'Генерація...' : isGenerated ? 'UUID згенеровано' : 'Згенерувати UUID'}
     </Button>
   );
 };

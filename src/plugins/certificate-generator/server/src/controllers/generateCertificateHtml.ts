@@ -56,8 +56,7 @@ export function generateCertificateHtml(certificateData) {
         : 'пройшов(ла) курс “Арбітраж трафіку” від команди Mustage Team';
 
   // HTML-шаблон
-  return `
-  <!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
@@ -70,7 +69,7 @@ export function generateCertificateHtml(certificateData) {
       rel="stylesheet"
     />
     <style>
-          * {
+      * {
         box-sizing: border-box;
       }
       html {
@@ -143,6 +142,9 @@ export function generateCertificateHtml(certificateData) {
       .certificate_block:last-child {
         page-break-after: auto; /* Останній блок без розриву */
       }
+      .certificate_block_main {
+        padding: 55px 18px 50px;
+      }
       .certificate_header {
         color: #000;
         font-size: 22px;
@@ -170,11 +172,12 @@ export function generateCertificateHtml(certificateData) {
         font-size: 56px;
         font-weight: 600;
         text-align: center;
+        white-space: nowrap;
         margin-bottom: 8px;
       }
       .certificate_name_bottom_text {
         margin: 0 auto;
-        max-width: 410px;
+        max-width: 355px;
         margin-bottom: 40px;
         color: #000;
         text-align: center;
@@ -307,7 +310,7 @@ export function generateCertificateHtml(certificateData) {
         padding-left: 4px;
         font-weight: 600;
       }
-        .supplement_format {
+      .supplement_format {
         margin-bottom: 40px;
       }
       .supplement_curator_text {
@@ -325,7 +328,7 @@ export function generateCertificateHtml(certificateData) {
       .supplement_seo_wrap {
         position: absolute;
         bottom: 45px;
-        right: 45px;
+        right: 70px;
         display: flex;
         gap: 8px;
         align-items: center;
@@ -343,12 +346,12 @@ export function generateCertificateHtml(certificateData) {
         color: #000;
         font-size: 14px;
         font-weight: 600;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
       }
       .report_table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
       .table_header {
         text-align: left;
@@ -387,28 +390,86 @@ export function generateCertificateHtml(certificateData) {
       }
       .notion_link {
         color: #000;
-        font-size: 9.713px;
+        font-size: 14px;
         font-weight: 400;
-        margin-bottom: 14px;
+        margin-bottom: 16px;
       }
       .notion_link a {
         padding-right: 4px;
         font-weight: 600;
         color: #000;
       }
+      .notion_link_video {
+        color: #000;
+        font-size: 14px;
+        font-weight: 400;
+        margin-bottom: 40px;
+      }
+      .notion_link_video a {
+        padding-right: 4px;
+        font-weight: 600;
+        color: #000;
+      }
       .average_grade {
         color: #000;
-        font-size: 9.713px;
+        font-size: 16px;
         font-weight: 400;
       }
       .average_grade span {
         padding-right: 4px;
         font-weight: 600;
       }
+      .notion_link_wrap {
+        margin-bottom: 40px;
+      }
+
+      .video_wrap {
+        position: relative;
+        width: 486px;
+        height: 265px;
+        border-radius: 13px;
+        background: #d9d9d9;
+        margin-bottom: 24px;
+      }
+
+      .video {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 24px;
+      }
+
+      .video_icon {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        width: 64px;
+        height: 64px;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        border-radius: 50%;
+      }
+
+      .video_box {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .video_icon_img {
+        width: 64px;
+        height: 64px;
+      }
     </style>
   </head>
   <body>
-    <div class="certificate_block">
+    <div class="certificate_block certificate_block_main">
       <h2 class="certificate_header">
         Сертифікат про закінчення навчального курсу
       </h2>
@@ -417,9 +478,7 @@ export function generateCertificateHtml(certificateData) {
       </p>
       <p class="certificate_name_text">Цей документ підтверджує, що</p>
       <h2 class="certificate_name">${certificateData.fullName || 'N/A'}</h2>
-          <p class="certificate_name_bottom_text">
-        ${courseCompletionText}
-      </p>
+      <p class="certificate_name_bottom_text">${courseCompletionText}</p>
       <div class="period_wrap">
         <p class="certificate_thread">
           Потік №: <span>${certificateData.streamNumber || 'N/A'}</span>
@@ -809,19 +868,86 @@ export function generateCertificateHtml(certificateData) {
       <p class="notion_link">
         Підсумковий проєкт (кейс):
         <a
-          href="${certificateData.caseLink || 'N/A'}"
+          href="${certificateData.caseLink}"
           target="_blank"
           rel="noopener noreferrer"
-          >${certificateData.caseLink || 'N/A'}</a
+          >${certificateData.caseLink}</a
         >
       </p>
       <p class="average_grade">
-        Середній бал за курс:
-        <span>${certificateData.averageGradePoints || 'N/A'}</span>
+        Середній бал за курс: <span>${certificateData.averageGradePoints}</span>
       </p>
       `
           : ''
       }
+    </div>
+
+    <div class="certificate_block">
+      ${
+        certificateData.tariff === 'pro'
+          ? `
+      <div class="notion_link_wrap">
+        <h2 class="card_header">Відеовідгук від СЕО курса:</h2>
+        <div class="video_wrap">
+          <div class="video_box"></div>
+          <a
+            class="video_icon"
+            href="${certificateData.videoReview}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="http://localhost:1337/certImg/play.webp"
+              alt="Mustage play icon"
+              class="video_icon_img"
+          /></a>
+        </div>
+      </div>
+      `
+          : `
+      <div class="notion_link_wrap">
+        <p class="notion_link_video">
+          Підсумковий проєкт (кейс):
+          <a
+            href="${certificateData.caseLink}"
+            target="_blank"
+            rel="noopener noreferrer"
+            >${certificateData.caseLink}</a
+          >
+        </p>
+        <p class="average_grade">
+          Середній бал за курс:
+          <span>${certificateData.averageGradePoints}</span>
+        </p>
+      </div>
+      `
+      }
+
+      <p class="academy_text">
+        З повагою, <br />
+        <span>Академія Mustage Team</span>
+      </p>
+
+      <div class="supplement_seo_wrap">
+        <p class="certificate_seo_text">
+          <span>Денис Панкратов</span> СЕО Mustage Team
+        </p>
+        <div class="certificate_stamp_wrap">
+          <img
+            src="http://localhost:1337/certImg/stamp.webp"
+            alt="Mustage stamp"
+            class="stamp"
+          />
+          <p class="certificate_stamp_id">
+            Certificate ID: <span>${certificateData.uuid || 'N/A'}</span>
+          </p>
+          <img
+            src="http://localhost:1337/certImg/seo_sign.webp"
+            alt="sign"
+            class="sign"
+          />
+        </div>
+      </div>
     </div>
   </body>
 </html>

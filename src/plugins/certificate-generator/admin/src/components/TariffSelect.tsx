@@ -18,19 +18,19 @@ const TariffSelect: React.FC<TariffSelectProps> = React.memo(
 
     const handleChange = (value: string | undefined) => {
       setLocalValue(value);
-      onChange(value || null); 
+      onChange(value || null);
     };
 
     return (
       <div style={style}>
         <label htmlFor="tariff" style={labelStyle}>
-          Tariff
+          Тариф
         </label>
         <SingleSelect
           id="tariff"
           value={localValue}
           onChange={handleChange}
-          placeholder="Select tariff"
+          placeholder="Оберіть тариф"
         >
           <SingleSelectOption value="free">Free</SingleSelectOption>
           <SingleSelectOption value="start">Start</SingleSelectOption>

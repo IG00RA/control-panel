@@ -8,7 +8,7 @@ import TariffSelect from '../components/TariffSelect';
 import GenderSelect from '../components/GenderSelect';
 import StatusSelect from '../components/StatusSelect';
 import DatePickerField from '../components/DatePickerField';
-import { Button } from '@strapi/design-system'; // Додаємо імпорт Button
+import { Button } from '@strapi/design-system';
 
 interface HomePageProps {}
 
@@ -43,6 +43,8 @@ export interface CertificateData {
   certStatus: 'valid' | 'discontinued' | 'cancelled' | null;
 }
 
+const BASE_URL = process.env.REACT_APP_API_URL || '';
+
 const HomePage: React.FC<HomePageProps> = () => {
   const [data, setData] = useState<CertificateData>({
     uuid: null,
@@ -73,31 +75,41 @@ const HomePage: React.FC<HomePageProps> = () => {
   }, []);
 
   const resetForm = () => {
-    setData({
-      uuid: null,
-      fullName: '',
-      streamNumber: null,
-      startDate: null,
-      endDate: null,
-      tariff: null,
-      telegramId: '',
-      grades: null,
-      qrCode: null,
-      averageGradePoints: null,
-      averageGradePercentages: null,
-      recommendationsMentor: '',
-      recommendationsCurator: '',
-      videoReview: '',
-      caseLink: '',
-      pdfUrl: null,
-      gender: 'male',
-      certStatus: 'valid',
-    });
-    if (fetchGradesResetRef.current) {
-      fetchGradesResetRef.current(); // Скидаємо FetchGrades
+    const confirmed = window.confirm('Очистити всі введені дані?');
+    if (confirmed) {
+      setData({
+        uuid: null,
+        fullName: '',
+        streamNumber: null,
+        startDate: null,
+        endDate: null,
+        tariff: null,
+        telegramId: '',
+        grades: null,
+        qrCode: null,
+        averageGradePoints: null,
+        averageGradePercentages: null,
+        recommendationsMentor: '',
+        recommendationsCurator: '',
+        videoReview: '',
+        caseLink: '',
+        pdfUrl: null,
+        gender: 'male',
+        certStatus: 'valid',
+      });
+      if (fetchGradesResetRef.current) {
+        fetchGradesResetRef.current();
+      }
+      if (generateUuidResetRef.current) {
+        generateUuidResetRef.current();
+      }
     }
-    if (generateUuidResetRef.current) {
-      generateUuidResetRef.current(); // Скидаємо GenerateUuidButton
+  };
+
+  const openPdfInNewTab = () => {
+    if (data.pdfUrl) {
+      const fullUrl = `${BASE_URL}${data.pdfUrl}`;
+      window.open(fullUrl, '_blank');
     }
   };
 
@@ -184,21 +196,21 @@ const HomePage: React.FC<HomePageProps> = () => {
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
           <GenerateUuidButton
             onUuidGenerated={(uuid: string) => updateData('uuid', uuid)}
-            onReset={(resetFn) => (generateUuidResetRef.current = resetFn)} // Передаємо функцію скидання
+            onReset={(resetFn) => (generateUuidResetRef.current = resetFn)}
           />
           {data.uuid && (
             <div style={styles.dataDisplay}>
-              <strong>Generated UUID:</strong> {data.uuid}
+              <strong>Згенерований UUID:</strong> {data.uuid}
             </div>
           )}
         </div>
 
         <InputField
           id="fullName"
-          label="Full Name"
+          label="Імя та Прізвище"
           value={data.fullName}
           onChange={(value) => updateData('fullName', value)}
-          placeholder="Enter full name"
+          placeholder="Введіть Імя та Прізвище"
           style={{ gridColumn: 'span 4', ...styles.card }}
         />
 
@@ -211,17 +223,17 @@ const HomePage: React.FC<HomePageProps> = () => {
 
         <InputField
           id="streamNumber"
-          label="Stream Number"
+          label="Номер потоку"
           value={data.streamNumber}
           onChange={(value) => updateData('streamNumber', value)}
-          placeholder="Enter stream number"
+          placeholder="Введіть номер потоку"
           type="number"
           style={{ gridColumn: 'span 4', ...styles.card }}
         />
 
         <DatePickerField
           id="startDate"
-          label="Start Date"
+          label="Дата початку навчання"
           value={data.startDate}
           onChange={(date) => updateData('startDate', date)}
           style={{ gridColumn: 'span 3', ...styles.card }}
@@ -230,7 +242,7 @@ const HomePage: React.FC<HomePageProps> = () => {
 
         <DatePickerField
           id="endDate"
-          label="End Date"
+          label="Дата завершення навчання"
           value={data.endDate}
           onChange={(date) => updateData('endDate', date)}
           style={{ gridColumn: 'span 3', ...styles.card }}
@@ -341,12 +353,12 @@ const HomePage: React.FC<HomePageProps> = () => {
                   updateData('averageGradePercentages', avgPercentages);
                 }
               }}
-              onReset={(resetFn) => (fetchGradesResetRef.current = resetFn)} // Передаємо функцію скидання
+              onReset={(resetFn) => (fetchGradesResetRef.current = resetFn)}
             />
           </div>
           {data.grades && (
             <div style={styles.dataDisplay}>
-              <strong>Grades:</strong>
+              <strong>Оцінки:</strong>
               <div
                 style={{
                   display: 'grid',
@@ -368,9 +380,7 @@ const HomePage: React.FC<HomePageProps> = () => {
 
                     return (
                       <div key={lesson}>
-                        <span style={{ color: '#fff', fontWeight: 'bold' }}>
-                          lesson {lesson} -{' '}
-                        </span>
+                        <span style={{ color: '#fff', fontWeight: 'bold' }}>Урок {lesson} - </span>
                         <span style={{ color: '#a1a1b3' }}>{content}</span>
                       </div>
                     );
@@ -389,9 +399,7 @@ const HomePage: React.FC<HomePageProps> = () => {
 
                     return (
                       <div key={lesson}>
-                        <span style={{ color: '#fff', fontWeight: 'bold' }}>
-                          lesson {lesson} -{' '}
-                        </span>
+                        <span style={{ color: '#fff', fontWeight: 'bold' }}>Урок {lesson} - </span>
                         <span style={{ color: '#a1a1b3' }}>{content}</span>
                       </div>
                     );
@@ -405,7 +413,7 @@ const HomePage: React.FC<HomePageProps> = () => {
         <div style={{ gridColumn: 'span 3', ...styles.card }}>
           <div style={styles.statCard}>
             <div style={styles.statValue}>{data.averageGradePoints ?? '-'}</div>
-            <div style={styles.label}>Average Grade Points</div>
+            <div style={styles.label}>Середній бал:</div>
           </div>
         </div>
 
@@ -414,25 +422,13 @@ const HomePage: React.FC<HomePageProps> = () => {
             <div style={styles.statValue}>
               {data.averageGradePoints ? `${data.averageGradePercentages}%` : '-'}
             </div>
-            <div style={styles.label}>Average Grade Percentages</div>
-          </div>
-        </div>
-
-        <div style={{ gridColumn: 'span 12', ...styles.card }}>
-          <label htmlFor="recommendationsMentor" style={styles.label}>
-            Recommendations from Mentor
-          </label>
-          <div style={styles.editor}>
-            <QuillEditor
-              value={data.recommendationsMentor}
-              onChange={(content: string) => updateData('recommendationsMentor', content)}
-            />
+            <div style={styles.label}>Середній бал в %:</div>
           </div>
         </div>
 
         <div style={{ gridColumn: 'span 12', ...styles.card }}>
           <label htmlFor="recommendationsCurator" style={styles.label}>
-            Recommendations from Curator
+            Рекомендації від куратора курсу:
           </label>
           <div style={styles.editor}>
             <QuillEditor
@@ -442,21 +438,33 @@ const HomePage: React.FC<HomePageProps> = () => {
           </div>
         </div>
 
+        <div style={{ gridColumn: 'span 12', ...styles.card }}>
+          <label htmlFor="recommendationsMentor" style={styles.label}>
+            Рекомендації від наставника курсу:
+          </label>
+          <div style={styles.editor}>
+            <QuillEditor
+              value={data.recommendationsMentor}
+              onChange={(content: string) => updateData('recommendationsMentor', content)}
+            />
+          </div>
+        </div>
+
         <InputField
           id="videoReview"
-          label="Video Review Link"
+          label="Посилання на відео-відгук"
           value={data.videoReview}
           onChange={(value) => updateData('videoReview', value)}
-          placeholder="Enter video review link"
+          placeholder="Введіть посилання"
           style={{ gridColumn: 'span 6', ...styles.card }}
         />
 
         <InputField
           id="caseLink"
-          label="Case Link"
+          label="Посилання на Кейс"
           value={data.caseLink}
           onChange={(value) => updateData('caseLink', value)}
-          placeholder="Enter case link"
+          placeholder="Введіть посилання на Кейс"
           style={{ gridColumn: 'span 6', ...styles.card }}
         />
 
@@ -467,12 +475,15 @@ const HomePage: React.FC<HomePageProps> = () => {
               onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
             />
             <Button variant="secondary" onClick={resetForm}>
-              Reset Form
+              Очистити введені дані
             </Button>
           </div>
           {data.pdfUrl && (
             <div style={styles.dataDisplay}>
-              <strong>Generated PDF:</strong> {data.pdfUrl}
+              <strong>Згенерований PDF: </strong>{' '}
+              <Button variant="default" onClick={openPdfInNewTab}>
+                Відкрити PDF
+              </Button>
             </div>
           )}
         </div>

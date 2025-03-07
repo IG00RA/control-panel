@@ -47,7 +47,7 @@ const FetchGrades: React.FC<FetchGradesProps> = ({ onGradesFetched, onReset }) =
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramId(e.target.value)}
       />
       <Button onClick={handleFetch} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Fetch Grades'}
+        {isLoading ? 'Loading...' : 'Отримати оцінки'}
       </Button>
     </>
   );

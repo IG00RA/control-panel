@@ -35,4 +35,13 @@ export default [
       auth: false,
     },
   },
+  {
+    method: 'PUT',
+    path: '/update-pdf/:id',
+    handler: 'certificate.updateCertificate',
+    config: {
+      policies: [],
+      auth: false,
+    },
+  },
 ];

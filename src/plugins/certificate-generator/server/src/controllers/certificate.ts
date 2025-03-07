@@ -139,4 +139,48 @@ export default {
       return ctx.send({ error: 'Failed to generate PDF' });
     }
   },
+  async updateCertificate(ctx) {
+    const { id } = ctx.params;
+    const updatedData = ctx.request.body;
+
+    try {
+      // Оновлюємо дані в базі
+      const updatedCertificate = await strapi.entityService.update(
+        'api::certificate.certificate',
+        id,
+        { data: updatedData }
+      );
+
+      // Перегенеруємо PDF з оновленими даними
+      const htmlContent = generateCertificateHtml(updatedCertificate); // Функція для генерації HTML
+      const puppeteer = require('puppeteer');
+
+      const browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+      const pdfPath = `./public/uploads/Certificate_${updatedCertificate.uuid}.pdf`;
+      await page.pdf({
+        path: pdfPath,
+        width: '842px',
+        height: '595px',
+        printBackground: true,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+        scale: 1.5,
+      });
+
+      await browser.close();
+
+      const pdfUrl = `/uploads/Certificate_${updatedCertificate.uuid}.pdf`;
+      return ctx.send({ pdfUrl });
+    } catch (error) {
+      console.error('Помилка при оновленні сертифіката:', error);
+      ctx.response.status = 500;
+      return ctx.send({ error: 'Не вдалося оновити сертифікат' });
+    }
+  },
 };

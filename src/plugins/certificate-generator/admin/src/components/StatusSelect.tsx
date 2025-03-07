@@ -27,7 +27,7 @@ const StatusSelect: React.FC<StatusSelectProps> = React.memo(
     return (
       <div style={style}>
         <label htmlFor="certStatus" style={labelStyle}>
-          Certificate Status
+          Статус сертифікату
         </label>
         <SingleSelect
           id="certStatus"
@@ -35,9 +35,9 @@ const StatusSelect: React.FC<StatusSelectProps> = React.memo(
           onChange={handleChange}
           placeholder="Select status"
         >
-          <SingleSelectOption value="valid">Valid</SingleSelectOption>
-          <SingleSelectOption value="discontinued">Discontinued</SingleSelectOption>
-          <SingleSelectOption value="cancelled">Cancelled</SingleSelectOption>
+          <SingleSelectOption value="valid">Дійсний</SingleSelectOption>
+          <SingleSelectOption value="discontinued">Припинено</SingleSelectOption>
+          <SingleSelectOption value="cancelled">Анульовано</SingleSelectOption>
         </SingleSelect>
       </div>
     );

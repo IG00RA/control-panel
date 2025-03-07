@@ -26,16 +26,16 @@ const GenderSelect: React.FC<GenderSelectProps> = React.memo(
     return (
       <div style={style}>
         <label htmlFor="gender" style={labelStyle}>
-          Gender
+          Стать
         </label>
         <SingleSelect
           id="gender"
           value={localValue}
           onChange={handleChange}
-          placeholder="Select gender"
+          placeholder="Оберіть стать"
         >
-          <SingleSelectOption value="male">Male</SingleSelectOption>
-          <SingleSelectOption value="female">Female</SingleSelectOption>
+          <SingleSelectOption value="male">Чоловік</SingleSelectOption>
+          <SingleSelectOption value="female">Жінка</SingleSelectOption>
         </SingleSelect>
       </div>
     );
