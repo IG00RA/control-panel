@@ -3,7 +3,7 @@ import { TextInput } from '@strapi/design-system';
 
 interface InputFieldProps {
   id: string;
-  label: string;
+  label?: string;
   value: string | number | undefined | null;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -26,18 +26,20 @@ const InputField: React.FC<InputFieldProps> = React.memo(
 
     return (
       <div style={style}>
-        <label
-          htmlFor={id}
-          style={{
-            fontSize: '1.5rem',
-            fontWeight: 500,
-            color: '#fff',
-            marginBottom: '8px',
-            display: 'block',
-          }}
-        >
-          {label}
-        </label>
+        {label && (
+          <label
+            htmlFor={id}
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: 500,
+              color: '#fff',
+              marginBottom: '8px',
+              display: 'block',
+            }}
+          >
+            {label}
+          </label>
+        )}
         <TextInput
           id={id}
           type={type}

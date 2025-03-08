@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import GenerateUuidButton from '../components/GenerateUuidButton';
 import FetchGrades from '../components/FetchGrades';
 import GeneratePdfButton from '../components/GeneratePdfButton';
@@ -41,6 +41,7 @@ export interface CertificateData {
   pdfUrl: string | null;
   gender: 'male' | 'female' | null;
   certStatus: 'valid' | 'discontinued' | 'cancelled' | null;
+  certificateId?: string | null;
 }
 
 const BASE_URL = process.env.REACT_APP_API_URL || '';
@@ -65,14 +66,27 @@ const HomePage: React.FC<HomePageProps> = () => {
     pdfUrl: null,
     gender: 'male',
     certStatus: 'valid',
+    certificateId: null,
   });
 
+  const [searchTelegramId, setSearchTelegramId] = useState('');
+  const [searchMessage, setSearchMessage] = useState('');
+  const [isSearchLoading, setIsSearchLoading] = useState(false); // Стан для запиту пошуку
+  const [isSearchDisabled, setIsSearchDisabled] = useState(false); // Стан для вимкнення кнопки після успішного пошуку
   const fetchGradesResetRef = useRef<(() => void) | null>(null);
   const generateUuidResetRef = useRef<(() => void) | null>(null);
+  const generatePdfResetRef = useRef<(() => void) | null>(null);
 
   const updateData = useCallback((key: keyof CertificateData, value: any) => {
     setData((prev) => ({ ...prev, [key]: value }));
   }, []);
+
+  const handleTelegramIdChange = (telegramId: string) => {
+    setData((prevData) => ({
+      ...prevData,
+      telegramId,
+    }));
+  };
 
   const resetForm = () => {
     const confirmed = window.confirm('Очистити всі введені дані?');
@@ -96,15 +110,61 @@ const HomePage: React.FC<HomePageProps> = () => {
         pdfUrl: null,
         gender: 'male',
         certStatus: 'valid',
+        certificateId: null,
       });
-      if (fetchGradesResetRef.current) {
-        fetchGradesResetRef.current();
-      }
-      if (generateUuidResetRef.current) {
-        generateUuidResetRef.current();
-      }
+      if (fetchGradesResetRef.current) fetchGradesResetRef.current();
+      if (generateUuidResetRef.current) generateUuidResetRef.current();
+      if (generatePdfResetRef.current) generatePdfResetRef.current();
+      setSearchMessage('');
+      setIsSearchDisabled(false); // Скидаємо стан кнопки пошуку
+      setSearchTelegramId(''); // Очищаємо поле пошуку
     }
   };
+
+  const handleSearch = async () => {
+    if (!searchTelegramId) {
+      setSearchMessage('Будь ласка, введіть Telegram ID');
+      return;
+    }
+
+    setIsSearchLoading(true);
+    try {
+      const res = await fetch('/certificate-generator/find-by-telegram-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchTelegramId }),
+      });
+      if (!res.ok) {
+        throw new Error('Не вдалося знайти дані');
+      }
+      const certificate = await res.json();
+      if (certificate) {
+        setData({
+          ...data,
+          ...certificate,
+          startDate: certificate.startDate ? new Date(certificate.startDate) : null,
+          endDate: certificate.endDate ? new Date(certificate.endDate) : null,
+          certificateId: certificate.id || null,
+        });
+        setSearchMessage('');
+        setIsSearchDisabled(true); // Вимикаємо кнопку після успішного пошуку
+      } else {
+        setSearchMessage('Даних не знайдено');
+      }
+    } catch (error) {
+      console.error('Помилка при пошуку сертифіката:', error);
+      setSearchMessage('Даних не знайдено');
+    } finally {
+      setIsSearchLoading(false);
+    }
+  };
+
+  // Скидаємо isSearchDisabled, якщо searchTelegramId змінюється
+  useEffect(() => {
+    if (searchTelegramId && isSearchDisabled) {
+      setIsSearchDisabled(false);
+    }
+  }, [searchTelegramId]);
 
   const openPdfInNewTab = () => {
     if (data.pdfUrl) {
@@ -183,7 +243,6 @@ const HomePage: React.FC<HomePageProps> = () => {
       display: 'block',
     },
     buttonContainer: {
-      // Стиль для контейнера кнопок
       display: 'flex',
       gap: '12px',
     },
@@ -193,16 +252,41 @@ const HomePage: React.FC<HomePageProps> = () => {
     <main style={styles.main}>
       <h1 style={styles.title}>Certificate Generator</h1>
       <div style={styles.grid}>
-        <div style={{ gridColumn: 'span 12', ...styles.card }}>
-          <GenerateUuidButton
-            onUuidGenerated={(uuid: string) => updateData('uuid', uuid)}
-            onReset={(resetFn) => (generateUuidResetRef.current = resetFn)}
-          />
-          {data.uuid && (
-            <div style={styles.dataDisplay}>
-              <strong>Згенерований UUID:</strong> {data.uuid}
-            </div>
-          )}
+        <div
+          style={{
+            gridColumn: 'span 12',
+            ...styles.card,
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <GenerateUuidButton
+              onUuidGenerated={(uuid: string) => updateData('uuid', uuid)}
+              onReset={(resetFn) => (generateUuidResetRef.current = resetFn)}
+              isDisabled={!!data.certificateId} // Вимикаємо кнопку, якщо є certificateId
+            />
+            {data.uuid && (
+              <div style={styles.dataDisplay}>
+                <strong>Згенерований UUID:</strong> {data.uuid}
+              </div>
+            )}
+          </div>
+          <span style={styles.label}>Або</span>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <InputField
+              id="searchTelegramId"
+              value={searchTelegramId}
+              onChange={(value) => setSearchTelegramId(value)}
+              placeholder="Введіть Telegram ID"
+              style={{ width: '300px' }}
+            />
+            <Button onClick={handleSearch} disabled={isSearchLoading || isSearchDisabled}>
+              {isSearchLoading ? 'Пошук...' : 'Пошук'}
+            </Button>
+            {searchMessage && <span style={{ color: '#ff6b6b' }}>{searchMessage}</span>}
+          </div>
         </div>
 
         <InputField
@@ -268,6 +352,7 @@ const HomePage: React.FC<HomePageProps> = () => {
           </label>
           <div style={{ display: 'flex', gap: '12px' }}>
             <FetchGrades
+              onTelegramIdChange={handleTelegramIdChange}
               onGradesFetched={(grades: any) => {
                 const lessons: Lesson[] = [
                   { lesson: '0.1', tests: ['testN1'], homework: [] },
@@ -473,6 +558,8 @@ const HomePage: React.FC<HomePageProps> = () => {
             <GeneratePdfButton
               certificateData={data}
               onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
+              onReset={(resetFn) => (generatePdfResetRef.current = resetFn)}
+              initialIsGenerated={!!data.certificateId}
             />
             <Button variant="secondary" onClick={resetForm}>
               Очистити введені дані

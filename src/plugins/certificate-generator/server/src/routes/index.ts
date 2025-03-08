@@ -19,15 +19,6 @@ export default [
   },
   {
     method: 'POST',
-    path: '/create',
-    handler: 'certificate.create',
-    config: {
-      policies: [],
-      auth: false,
-    },
-  },
-  {
-    method: 'POST',
     path: '/generate-pdf',
     handler: 'certificate.generatePdf',
     config: {
@@ -39,6 +30,15 @@ export default [
     method: 'PUT',
     path: '/update-pdf/:id',
     handler: 'certificate.updateCertificate',
+    config: {
+      policies: [],
+      auth: false,
+    },
+  },
+  {
+    method: 'POST',
+    path: '/find-by-telegram-id',
+    handler: 'certificate.findByTelegramId',
     config: {
       policies: [],
       auth: false,

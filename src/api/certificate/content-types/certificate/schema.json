@@ -31,28 +31,16 @@
     },
     "tariff": {
       "type": "enumeration",
-      "enum": [
-        "free",
-        "start",
-        "base",
-        "pro"
-      ]
+      "enum": ["free", "start", "base", "pro"]
     },
     "gender": {
       "type": "enumeration",
-      "enum": [
-        "male",
-        "female"
-      ],
+      "enum": ["male", "female"],
       "default": "male"
     },
     "certStatus": {
       "type": "enumeration",
-      "enum": [
-        "valid",
-        "discontinued",
-        "cancelled"
-      ]
+      "enum": ["valid", "discontinued", "cancelled"]
     },
     "grades": {
       "type": "json"
@@ -77,6 +65,11 @@
     },
     "pdfPath": {
       "type": "string"
+    },
+    "telegramId": {
+      "type": "string",
+      "unique": true,
+      "required": true
     }
   }
 }

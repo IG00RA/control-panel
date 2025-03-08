@@ -408,6 +408,9 @@ export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
     startDate: Schema.Attribute.Date;
     streamNumber: Schema.Attribute.Integer;
     tariff: Schema.Attribute.Enumeration<['free', 'start', 'base', 'pro']>;
+    telegramId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

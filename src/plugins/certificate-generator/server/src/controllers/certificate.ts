@@ -36,6 +36,33 @@ interface CertificateInput {
 }
 
 export default {
+  async findByTelegramId(ctx: StrapiContext) {
+    const { searchTelegramId } = ctx.request.body;
+    console.log('searchTelegramId2', searchTelegramId);
+
+    if (!searchTelegramId) {
+      ctx.response.status = 400;
+      return ctx.send({ error: 'Telegram ID is required' });
+    }
+
+    try {
+      const certificates = await strapi.entityService.findMany('api::certificate.certificate', {
+        filters: { telegramId: searchTelegramId },
+      });
+
+      if (certificates.length > 0) {
+        return ctx.send(certificates[0]); // Повертаємо перший знайдений сертифікат
+      } else {
+        ctx.response.status = 404;
+        return ctx.send(null); // Повертаємо null, якщо сертифікат не знайдено
+      }
+    } catch (error) {
+      console.error('Error finding certificate by Telegram ID:', error);
+      ctx.response.status = 500;
+      return ctx.send({ error: 'Failed to find certificate' });
+    }
+  },
+
   async generateUuid(ctx: StrapiContext) {
     try {
       const generateRandomId = () => {
@@ -88,28 +115,19 @@ export default {
     }
   },
 
-  async create(ctx: StrapiContext) {
-    const data = ctx.request.body.data as CertificateInput;
+  async generatePdf(ctx: StrapiContext) {
+    const certificateData = ctx.request.body as CertificateInput;
+
     try {
+      const pdfUrl = `/uploads/${certificateData.uuid}/Certificate_${certificateData.uuid}.pdf`;
       const certificate = await strapi.entityService.create('api::certificate.certificate', {
-        data: { ...data },
+        data: { ...certificateData, pdfPath: pdfUrl },
       });
-      return ctx.send(certificate);
-    } catch (error) {
-      console.error('Error creating certificate:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Error creating certificate' };
-      return;
-    }
-  },
 
-  async generatePdf(ctx) {
-    const certificateData = ctx.request.body;
-
-    try {
       const htmlContent = generateCertificateHtml(certificateData);
-
       const puppeteer = require('puppeteer');
+      const fs = require('fs');
+      const path = require('path');
 
       const browser = await puppeteer.launch({
         headless: 'new',
@@ -119,7 +137,14 @@ export default {
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-      const pdfPath = `./public/uploads/Certificate_${certificateData.uuid}.pdf`;
+      const uploadDir = `./public/uploads/${certificateData.uuid}`;
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      } else {
+        console.log(`Директорія вже існує: ${uploadDir}`);
+      }
+
+      const pdfPath = path.join(uploadDir, `Certificate_${certificateData.uuid}.pdf`);
       await page.pdf({
         path: pdfPath,
         width: '842px',
@@ -129,16 +154,63 @@ export default {
         scale: 1.5,
       });
 
+      console.log(`PDF збережено за шляхом: ${pdfPath}`);
+
+      const numPages = 7;
+      const imageUrls = [];
+      await page.setViewport({
+        width: 842,
+        height: 595,
+      });
+
+      for (let i = 1; i <= numPages; i++) {
+        const imagePath = path.join(uploadDir, `img_${certificateData.uuid}_page${i}.jpeg`);
+        await page.screenshot({
+          path: imagePath,
+          type: 'jpeg',
+          clip: {
+            x: 0,
+            y: (i - 1) * 595,
+            width: 842,
+            height: 595,
+          },
+        });
+        imageUrls.push(
+          `/uploads/${certificateData.uuid}/img_${certificateData.uuid}_page${i}.jpeg`
+        );
+      }
+
       await browser.close();
 
-      const pdfUrl = `/uploads/Certificate_${certificateData.uuid}.pdf`;
-      return ctx.send({ pdfUrl });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
+      return ctx.send({ pdfUrl, imageUrls, certificateId: certificate.id });
+    } catch (error: any) {
+      console.error('Помилка при генерації або збереженні PDF:', error);
+
+      if (error.name === 'ValidationError' && error.details?.errors) {
+        const errorDetails = error.details.errors[0]; // Беремо першу помилку
+        const field = errorDetails.path[0]; // Отримуємо назву поля (наприклад, "telegramId")
+        const message = `Поле ${field} має бути унікальним`; // Формуємо конкретне повідомлення
+
+        ctx.response.status = 400;
+        return ctx.send({
+          error: {
+            name: error.name,
+            message,
+            details: error.details,
+          },
+        });
+      }
+
       ctx.response.status = 500;
-      return ctx.send({ error: 'Failed to generate PDF' });
+      return ctx.send({
+        error: {
+          name: error.name || 'ServerError',
+          message: error.message || 'Не вдалося згенерувати або зберегти PDF',
+        },
+      });
     }
   },
+
   async updateCertificate(ctx) {
     const { id } = ctx.params;
     const updatedData = ctx.request.body;
@@ -152,8 +224,10 @@ export default {
       );
 
       // Перегенеруємо PDF з оновленими даними
-      const htmlContent = generateCertificateHtml(updatedCertificate); // Функція для генерації HTML
+      const htmlContent = generateCertificateHtml(updatedCertificate);
       const puppeteer = require('puppeteer');
+      const fs = require('fs');
+      const path = require('path');
 
       const browser = await puppeteer.launch({
         headless: 'new',
@@ -163,7 +237,18 @@ export default {
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-      const pdfPath = `./public/uploads/Certificate_${updatedCertificate.uuid}.pdf`;
+      // Визначення абсолютного шляху до директорії
+      const uploadDir = `./public/uploads/${updatedCertificate.uuid}`;
+
+      // Перевірка та створення директорії, якщо вона не існує
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      } else {
+        console.log(`Директорія вже існує: ${uploadDir}`);
+      }
+
+      // Шлях до PDF-файлу
+      const pdfPath = path.join(uploadDir, `Certificate_${updatedCertificate.uuid}.pdf`);
       await page.pdf({
         path: pdfPath,
         width: '842px',
@@ -173,9 +258,35 @@ export default {
         scale: 1.5,
       });
 
+      const numPages = 7;
+      const imageUrls = [];
+      await page.setViewport({
+        width: 842,
+        height: 595,
+      });
+
+      // Генерація зображень
+      for (let i = 1; i <= numPages; i++) {
+        const imagePath = path.join(uploadDir, `img_${updatedCertificate.uuid}_page${i}.jpeg`);
+        await page.screenshot({
+          path: imagePath,
+          type: 'jpeg',
+          clip: {
+            x: 0,
+            y: (i - 1) * 595,
+            width: 842,
+            height: 595,
+          },
+        });
+        imageUrls.push(
+          `/uploads/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}.jpeg`
+        );
+      }
+
       await browser.close();
 
-      const pdfUrl = `/uploads/Certificate_${updatedCertificate.uuid}.pdf`;
+      // Коректний шлях до PDF у відповіді
+      const pdfUrl = `/uploads/${updatedCertificate.uuid}/Certificate_${updatedCertificate.uuid}.pdf`;
       return ctx.send({ pdfUrl });
     } catch (error) {
       console.error('Помилка при оновленні сертифіката:', error);
