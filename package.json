@@ -7,7 +7,7 @@
     "build": "strapi build",
     "deploy": "strapi deploy",
     "dev": "strapi develop",
-    "postinstall": "cd src/plugins/pdf-reader && npm run build && cd src/plugins/certificate-generator && npm run build",
+    "postinstall": "cd src/plugins/pdf-reader && npm run build && cd ../certificate-generator && npm run build",
     "start": "strapi start",
     "strapi": "strapi"
   },
