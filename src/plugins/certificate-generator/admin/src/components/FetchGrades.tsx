@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, Button } from '@strapi/design-system';
 
 interface FetchGradesProps {
   onGradesFetched: (grades: any) => void;
-  onTelegramIdChange: (telegramId: string) => void; // Новий пропс для оновлення telegramId
+  onTelegramIdChange: (telegramId: string) => void;
   onReset?: (resetFn: () => void) => void;
+  initialTelegramId?: string; // Додаємо пропс для початкового значення
 }
 
 const FetchGrades: React.FC<FetchGradesProps> = ({
   onGradesFetched,
   onTelegramIdChange,
   onReset,
+  initialTelegramId = '', // Значення за замовчуванням - порожній рядок
 }) => {
-  const [telegramId, setTelegramId] = useState('');
+  const [telegramId, setTelegramId] = useState(initialTelegramId);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Оновлюємо telegramId, якщо initialTelegramId змінюється
+  useEffect(() => {
+    setTelegramId(initialTelegramId);
+  }, [initialTelegramId]);
 
   const resetState = () => {
     setTelegramId('');
@@ -29,8 +36,8 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
         body: JSON.stringify({ telegramId }),
       });
       const data = await res.json();
-      onGradesFetched(data); // Передаємо оцінки в головний компонент
-      onTelegramIdChange(telegramId); // Передаємо telegramId для оновлення стейту
+      onGradesFetched(data);
+      onTelegramIdChange(telegramId);
     } catch (error) {
       console.error('Error fetching grades:', error);
     } finally {
@@ -38,7 +45,7 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (onReset) {
       onReset(resetState);
     }

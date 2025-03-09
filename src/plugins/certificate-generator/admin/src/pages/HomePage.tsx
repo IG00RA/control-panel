@@ -9,6 +9,8 @@ import GenderSelect from '../components/GenderSelect';
 import StatusSelect from '../components/StatusSelect';
 import DatePickerField from '../components/DatePickerField';
 import { Button } from '@strapi/design-system';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface HomePageProps {}
 
@@ -71,8 +73,8 @@ const HomePage: React.FC<HomePageProps> = () => {
 
   const [searchTelegramId, setSearchTelegramId] = useState('');
   const [searchMessage, setSearchMessage] = useState('');
-  const [isSearchLoading, setIsSearchLoading] = useState(false); // Стан для запиту пошуку
-  const [isSearchDisabled, setIsSearchDisabled] = useState(false); // Стан для вимкнення кнопки після успішного пошуку
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [isSearchDisabled, setIsSearchDisabled] = useState(false);
   const fetchGradesResetRef = useRef<(() => void) | null>(null);
   const generateUuidResetRef = useRef<(() => void) | null>(null);
   const generatePdfResetRef = useRef<(() => void) | null>(null);
@@ -116,8 +118,8 @@ const HomePage: React.FC<HomePageProps> = () => {
       if (generateUuidResetRef.current) generateUuidResetRef.current();
       if (generatePdfResetRef.current) generatePdfResetRef.current();
       setSearchMessage('');
-      setIsSearchDisabled(false); // Скидаємо стан кнопки пошуку
-      setSearchTelegramId(''); // Очищаємо поле пошуку
+      setIsSearchDisabled(false);
+      setSearchTelegramId('');
     }
   };
 
@@ -139,27 +141,41 @@ const HomePage: React.FC<HomePageProps> = () => {
       }
       const certificate = await res.json();
       if (certificate) {
+        // Використовуємо let замість const, щоб дозволити переназначення
+        let startDate = certificate.startDate ? new Date(certificate.startDate) : null;
+        let endDate = certificate.endDate ? new Date(certificate.endDate) : null;
+
+        if (startDate && isNaN(startDate.getTime())) {
+          startDate = null;
+        }
+        if (endDate && isNaN(endDate.getTime())) {
+          endDate = null;
+        }
+
         setData({
           ...data,
           ...certificate,
-          startDate: certificate.startDate ? new Date(certificate.startDate) : null,
-          endDate: certificate.endDate ? new Date(certificate.endDate) : null,
+          startDate,
+          endDate,
           certificateId: certificate.id || null,
+          telegramId: searchTelegramId,
+          pdfUrl: certificate.pdfPath,
         });
         setSearchMessage('');
-        setIsSearchDisabled(true); // Вимикаємо кнопку після успішного пошуку
+        setIsSearchDisabled(true);
+        toast.success('Сертифікат успішно знайдено в базі!', {
+          autoClose: 3000,
+        });
       } else {
         setSearchMessage('Даних не знайдено');
       }
     } catch (error) {
-      console.error('Помилка при пошуку сертифіката:', error);
       setSearchMessage('Даних не знайдено');
     } finally {
       setIsSearchLoading(false);
     }
   };
 
-  // Скидаємо isSearchDisabled, якщо searchTelegramId змінюється
   useEffect(() => {
     if (searchTelegramId && isSearchDisabled) {
       setIsSearchDisabled(false);
@@ -251,6 +267,17 @@ const HomePage: React.FC<HomePageProps> = () => {
   return (
     <main style={styles.main}>
       <h1 style={styles.title}>Certificate Generator</h1>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div style={styles.grid}>
         <div
           style={{
@@ -263,9 +290,12 @@ const HomePage: React.FC<HomePageProps> = () => {
         >
           <div>
             <GenerateUuidButton
-              onUuidGenerated={(uuid: string) => updateData('uuid', uuid)}
+              onUuidGenerated={(uuid: string) => {
+                updateData('uuid', uuid);
+                toast.success('UUID успішно згенеровано!', { autoClose: 3000 });
+              }}
               onReset={(resetFn) => (generateUuidResetRef.current = resetFn)}
-              isDisabled={!!data.certificateId} // Вимикаємо кнопку, якщо є certificateId
+              isDisabled={!!data.certificateId}
             />
             {data.uuid && (
               <div style={styles.dataDisplay}>
@@ -283,7 +313,7 @@ const HomePage: React.FC<HomePageProps> = () => {
               style={{ width: '300px' }}
             />
             <Button onClick={handleSearch} disabled={isSearchLoading || isSearchDisabled}>
-              {isSearchLoading ? 'Пошук...' : 'Пошук'}
+              {isSearchLoading ? 'Шукаю...' : 'Пошук'}
             </Button>
             {searchMessage && <span style={{ color: '#ff6b6b' }}>{searchMessage}</span>}
           </div>
@@ -437,8 +467,10 @@ const HomePage: React.FC<HomePageProps> = () => {
                       : null;
                   updateData('averageGradePercentages', avgPercentages);
                 }
+                toast.success('Оцінки успішно отримано з Google!', { autoClose: 3000 });
               }}
               onReset={(resetFn) => (fetchGradesResetRef.current = resetFn)}
+              initialTelegramId={data.telegramId}
             />
           </div>
           {data.grades && (
@@ -557,9 +589,22 @@ const HomePage: React.FC<HomePageProps> = () => {
           <div style={styles.buttonContainer}>
             <GeneratePdfButton
               certificateData={data}
-              onPdfGenerated={(pdf: string) => updateData('pdfUrl', pdf)}
+              onPdfGenerated={(pdf: string) => {
+                updateData('pdfUrl', pdf);
+                toast.success(
+                  data.certificateId ? 'PDF успішно оновлено!' : 'PDF успішно згенеровано!',
+                  { autoClose: 3000 }
+                );
+              }}
               onReset={(resetFn) => (generatePdfResetRef.current = resetFn)}
               initialIsGenerated={!!data.certificateId}
+              setNotification={(notification) =>
+                notification
+                  ? notification.variant === 'success'
+                    ? toast.success(notification.message, { autoClose: 3000 })
+                    : toast.error(notification.message, { autoClose: 3000 })
+                  : null
+              }
             />
             <Button variant="secondary" onClick={resetForm}>
               Очистити введені дані

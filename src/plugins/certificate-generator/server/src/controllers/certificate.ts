@@ -161,6 +161,7 @@ export default {
       await page.setViewport({
         width: 842,
         height: 595,
+        deviceScaleFactor: 1.2,
       });
 
       for (let i = 1; i <= numPages; i++) {
@@ -168,6 +169,7 @@ export default {
         await page.screenshot({
           path: imagePath,
           type: 'jpeg',
+          quality: 100,
           clip: {
             x: 0,
             y: (i - 1) * 595,
@@ -263,6 +265,7 @@ export default {
       await page.setViewport({
         width: 842,
         height: 595,
+        deviceScaleFactor: 1.2,
       });
 
       // Генерація зображень
@@ -271,6 +274,7 @@ export default {
         await page.screenshot({
           path: imagePath,
           type: 'jpeg',
+          quality: 100,
           clip: {
             x: 0,
             y: (i - 1) * 595,

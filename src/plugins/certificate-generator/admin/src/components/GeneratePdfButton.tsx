@@ -1,37 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Alert } from '@strapi/design-system';
+import { Button } from '@strapi/design-system';
 import { CertificateData } from 'src/pages/HomePage';
+import { toast } from 'react-toastify';
 
 interface GeneratePdfButtonProps {
   certificateData: CertificateData;
   onPdfGenerated: (pdfUrl: string) => void;
   onReset?: (resetFn: () => void) => void;
-  initialIsGenerated?: boolean; // Додаємо пропс для початкового стану
+  initialIsGenerated?: boolean;
+  setNotification: (
+    notification: { message: string; variant: 'success' | 'danger' } | null
+  ) => void;
 }
 
 const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
   certificateData,
   onPdfGenerated,
   onReset,
-  initialIsGenerated = false, // Значення за замовчуванням false
+  initialIsGenerated = false,
+  setNotification,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isGenerated, setIsGenerated] = useState(initialIsGenerated); // Використовуємо initialIsGenerated
+  const [isGenerated, setIsGenerated] = useState(initialIsGenerated);
   const [certificateId, setCertificateId] = useState<string | null>(
     certificateData.certificateId || null
   );
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const resetState = () => {
     setIsLoading(false);
     setIsGenerated(false);
     setCertificateId(null);
-    setErrorMessage(null);
+  };
+
+  const validateFields = () => {
+    const requiredFields = {
+      uuid: certificateData.uuid,
+      fullName: certificateData.fullName,
+      streamNumber: certificateData.streamNumber,
+      startDate: certificateData.startDate,
+      endDate: certificateData.endDate,
+      tariff: certificateData.tariff,
+      telegramId: certificateData.telegramId,
+      grades: certificateData.grades,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      setNotification({
+        message: `Заповніть обов’язкові поля: ${missingFields.join(', ')}`,
+        variant: 'danger',
+      });
+      return false;
+    }
+    return true;
   };
 
   const handleGeneratePdf = async () => {
+    if (!validateFields()) return;
+
     setIsLoading(true);
-    setErrorMessage(null);
     try {
       if (!isGenerated) {
         const response = await fetch('/certificate-generator/generate-pdf', {
@@ -40,7 +70,6 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
           body: JSON.stringify(certificateData),
         });
         const responseData = await response.json();
-        console.log('Response:', responseData);
 
         if (!response.ok || responseData.error) {
           const errorMsg = responseData.error?.message || 'Не вдалося згенерувати PDF';
@@ -69,7 +98,7 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
       }
     } catch (error: any) {
       console.error('Помилка при генерації або оновленні PDF:', error);
-      setErrorMessage(error.message);
+      setNotification({ message: error.message, variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
@@ -81,30 +110,17 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
     }
   }, [onReset]);
 
-  // Оновлюємо certificateId, якщо він змінюється у certificateData
   useEffect(() => {
     if (certificateData.certificateId) {
       setCertificateId(certificateData.certificateId);
-      setIsGenerated(true); // Встановлюємо isGenerated у true, якщо certificateId є
+      setIsGenerated(true);
     }
   }, [certificateData.certificateId]);
 
   return (
-    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-      <Button onClick={handleGeneratePdf} disabled={isLoading}>
-        {isLoading ? 'Обробка...' : isGenerated ? 'Оновити PDF' : 'Згенерувати PDF'}
-      </Button>
-      {errorMessage && (
-        <Alert
-          onClose={() => setErrorMessage(null)}
-          title="Помилка"
-          variant="danger"
-          style={{ marginTop: '10px' }}
-        >
-          {errorMessage}
-        </Alert>
-      )}
-    </div>
+    <Button onClick={handleGeneratePdf} disabled={isLoading}>
+      {isLoading ? 'Обробка...' : isGenerated ? 'Оновити PDF' : 'Згенерувати PDF'}
+    </Button>
   );
 };
 

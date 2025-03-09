@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { DatePicker } from '@strapi/design-system';
 
 interface DatePickerFieldProps {
@@ -11,20 +11,12 @@ interface DatePickerFieldProps {
 }
 
 const DatePickerField: React.FC<DatePickerFieldProps> = React.memo(
-  ({ id, label, value: initialValue, onChange, style, labelStyle }) => {
-    const [localValue, setLocalValue] = useState<Date | undefined>(initialValue || undefined);
-
-    useEffect(() => {
-      setLocalValue(initialValue || undefined);
-    }, [initialValue]);
-
+  ({ id, label, value, onChange, style, labelStyle }) => {
     const handleChange = (date: Date) => {
-      setLocalValue(date);
-      onChange(date); // Передаємо значення одразу
+      onChange(date);
     };
 
     const handleClear = () => {
-      setLocalValue(undefined);
       onChange(null);
     };
 
@@ -35,7 +27,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = React.memo(
         </label>
         <DatePicker
           id={id}
-          selectedDate={localValue}
+          value={value}
           onChange={handleChange}
           onClear={handleClear}
           locale="ru-RU"
