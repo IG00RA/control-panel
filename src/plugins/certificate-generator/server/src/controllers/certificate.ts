@@ -1,20 +1,6 @@
 import axios from 'axios';
 import { generateCertificateHtml } from './generateCertificateHtml';
 
-interface ContextOfStrapi {
-  request: {
-    body: any;
-  };
-  params: {
-    id?: string;
-  };
-  send: (data: any) => void;
-  response: {
-    status?: number;
-    body?: any;
-  };
-}
-
 interface CertificateInput {
   uuid?: string;
   fullName: string;
@@ -36,7 +22,7 @@ interface CertificateInput {
 }
 
 export default {
-  async findByTelegramId(ctx: ContextOfStrapi) {
+  async findByTelegramId(ctx) {
     const { searchTelegramId } = ctx.request.body;
     console.log('searchTelegramId2', searchTelegramId);
 
@@ -62,8 +48,7 @@ export default {
       return ctx.send({ error: 'Failed to find certificate' });
     }
   },
-
-  async generateUuid(ctx: ContextOfStrapi) {
+  async generateUuid(ctx) {
     try {
       const generateRandomId = () => {
         const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -100,7 +85,7 @@ export default {
     }
   },
 
-  async fetchGrades(ctx: ContextOfStrapi) {
+  async fetchGrades(ctx) {
     const { telegramId } = ctx.request.body;
     const googleSheetsScriptUrl = process.env.GOOGLE_SHEETS_SCRIPT_URL;
     try {
@@ -115,7 +100,7 @@ export default {
     }
   },
 
-  async generatePdf(ctx: ContextOfStrapi) {
+  async generatePdf(ctx) {
     const certificateData = ctx.request.body as CertificateInput;
 
     try {
