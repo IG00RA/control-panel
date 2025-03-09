@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { generateCertificateHtml } from './generateCertificateHtml';
 
-interface StrapiContext {
+interface ContextOfStrapi {
   request: {
     body: any;
   };
@@ -36,7 +36,7 @@ interface CertificateInput {
 }
 
 export default {
-  async findByTelegramId(ctx: StrapiContext) {
+  async findByTelegramId(ctx: ContextOfStrapi) {
     const { searchTelegramId } = ctx.request.body;
     console.log('searchTelegramId2', searchTelegramId);
 
@@ -63,7 +63,7 @@ export default {
     }
   },
 
-  async generateUuid(ctx: StrapiContext) {
+  async generateUuid(ctx: ContextOfStrapi) {
     try {
       const generateRandomId = () => {
         const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -100,7 +100,7 @@ export default {
     }
   },
 
-  async fetchGrades(ctx: StrapiContext) {
+  async fetchGrades(ctx: ContextOfStrapi) {
     const { telegramId } = ctx.request.body;
     const googleSheetsScriptUrl = process.env.GOOGLE_SHEETS_SCRIPT_URL;
     try {
@@ -115,7 +115,7 @@ export default {
     }
   },
 
-  async generatePdf(ctx: StrapiContext) {
+  async generatePdf(ctx: ContextOfStrapi) {
     const certificateData = ctx.request.body as CertificateInput;
 
     try {
