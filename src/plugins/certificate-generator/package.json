@@ -64,7 +64,7 @@
     "kind": "plugin",
     "name": "certificate-generator",
     "displayName": "Certificate generator",
-    "description": ""
+    "description": "Certificate generator"
   },
   "name": "strapi-plugin-certificate-generator",
   "description": "",
