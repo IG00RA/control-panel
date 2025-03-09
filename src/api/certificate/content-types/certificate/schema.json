@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "certificates",
+  "info": {
+    "singularName": "certificate",
+    "pluralName": "certificates",
+    "displayName": "Certificate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "uuid": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "fullName": {
+      "type": "string"
+    },
+    "streamNumber": {
+      "type": "integer"
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "tariff": {
+      "type": "enumeration",
+      "enum": ["free", "start", "base", "pro"]
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": ["male", "female"],
+      "default": "male"
+    },
+    "certStatus": {
+      "type": "enumeration",
+      "enum": ["valid", "discontinued", "cancelled"]
+    },
+    "grades": {
+      "type": "json"
+    },
+    "averageGradePoints": {
+      "type": "decimal"
+    },
+    "averageGradePercentages": {
+      "type": "decimal"
+    },
+    "recommendationsMentor": {
+      "type": "richtext"
+    },
+    "recommendationsCurator": {
+      "type": "richtext"
+    },
+    "videoReview": {
+      "type": "string"
+    },
+    "caseLink": {
+      "type": "string"
+    },
+    "pdfPath": {
+      "type": "string"
+    },
+    "telegramId": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    }
+  }
+}

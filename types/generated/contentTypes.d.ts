@@ -369,6 +369,58 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
+  collectionName: 'certificates';
+  info: {
+    description: '';
+    displayName: 'Certificate';
+    pluralName: 'certificates';
+    singularName: 'certificate';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    averageGradePercentages: Schema.Attribute.Decimal;
+    averageGradePoints: Schema.Attribute.Decimal;
+    caseLink: Schema.Attribute.String;
+    certStatus: Schema.Attribute.Enumeration<
+      ['valid', 'discontinued', 'cancelled']
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    endDate: Schema.Attribute.Date;
+    fullName: Schema.Attribute.String;
+    gender: Schema.Attribute.Enumeration<['male', 'female']> &
+      Schema.Attribute.DefaultTo<'male'>;
+    grades: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::certificate.certificate'
+    > &
+      Schema.Attribute.Private;
+    pdfPath: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    recommendationsCurator: Schema.Attribute.RichText;
+    recommendationsMentor: Schema.Attribute.RichText;
+    startDate: Schema.Attribute.Date;
+    streamNumber: Schema.Attribute.Integer;
+    tariff: Schema.Attribute.Enumeration<['free', 'start', 'base', 'pro']>;
+    telegramId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    uuid: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    videoReview: Schema.Attribute.String;
+  };
+}
+
 export interface ApiConsumableConsumable extends Struct.CollectionTypeSchema {
   collectionName: 'consumables';
   info: {
@@ -1175,6 +1227,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::certificate.certificate': ApiCertificateCertificate;
       'api::consumable.consumable': ApiConsumableConsumable;
       'api::displayed-price.displayed-price': ApiDisplayedPriceDisplayedPrice;
       'api::main-page-element.main-page-element': ApiMainPageElementMainPageElement;
