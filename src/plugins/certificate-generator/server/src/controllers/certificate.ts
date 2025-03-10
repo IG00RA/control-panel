@@ -165,6 +165,39 @@ export default {
         imageUrls.push(
           `/uploads/${certificateData.uuid}/img_${certificateData.uuid}_page${i}.jpeg`
         );
+        if (i === 1) {
+          const smallImagePath = path.join(
+            uploadDir,
+            `img_${certificateData.uuid}_page${i}_small.jpeg`
+          );
+          await page.setViewport({
+            width: 842,
+            height: 595,
+            deviceScaleFactor: 0.3,
+          });
+
+          await page.screenshot({
+            path: smallImagePath,
+            type: 'jpeg',
+            quality: 80,
+            fullPage: false,
+            clip: {
+              x: 0,
+              y: 0,
+              width: 842,
+              height: 595,
+            },
+          });
+
+          imageUrls.push(
+            `/uploads/${certificateData.uuid}/img_${certificateData.uuid}_page${i}_small.jpeg`
+          );
+          await page.setViewport({
+            width: 842,
+            height: 595,
+            deviceScaleFactor: 1.2,
+          });
+        }
       }
 
       await browser.close();
@@ -270,11 +303,43 @@ export default {
         imageUrls.push(
           `/uploads/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}.jpeg`
         );
+        if (i === 1) {
+          const smallImagePath = path.join(
+            uploadDir,
+            `img_${updatedCertificate.uuid}_page${i}_small.jpeg`
+          );
+          await page.setViewport({
+            width: 842,
+            height: 595,
+            deviceScaleFactor: 0.3,
+          });
+
+          await page.screenshot({
+            path: smallImagePath,
+            type: 'jpeg',
+            quality: 80,
+            fullPage: false,
+            clip: {
+              x: 0,
+              y: 0,
+              width: 842,
+              height: 595,
+            },
+          });
+
+          imageUrls.push(
+            `/uploads/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}_small.jpeg`
+          );
+          await page.setViewport({
+            width: 842,
+            height: 595,
+            deviceScaleFactor: 1.2,
+          });
+        }
       }
 
       await browser.close();
 
-      // Коректний шлях до PDF у відповіді
       const pdfUrl = `/uploads/${updatedCertificate.uuid}/Certificate_${updatedCertificate.uuid}.pdf`;
       return ctx.send({ pdfUrl });
     } catch (error) {
