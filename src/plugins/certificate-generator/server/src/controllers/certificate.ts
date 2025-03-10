@@ -21,10 +21,12 @@ interface CertificateInput {
   certStatus?: 'valid' | 'discontinued' | 'cancelled' | null;
 }
 
+const FOLDER_URL = process.env.REACT_APP_API_FOLDER_URL || '';
+const BASE_URL = process.env.REACT_APP_API_URL || '';
+
 export default {
   async findByTelegramId(ctx) {
     const { searchTelegramId } = ctx.request.body;
-    console.log('searchTelegramId2', searchTelegramId);
 
     if (!searchTelegramId) {
       ctx.response.status = 400;
@@ -104,7 +106,7 @@ export default {
     const certificateData = ctx.request.body as CertificateInput;
 
     try {
-      const pdfUrl = `/uploads/${certificateData.uuid}/Certificate_${certificateData.uuid}.pdf`;
+      const pdfUrl = `${BASE_URL}/api/certificate/${certificateData.uuid}/Certificate_${certificateData.uuid}.pdf`;
       const certificate = await strapi.entityService.create('api::certificate.certificate', {
         data: { ...certificateData, pdfPath: pdfUrl },
       });
@@ -122,7 +124,7 @@ export default {
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-      const uploadDir = `./public/uploads/${certificateData.uuid}`;
+      const uploadDir = `${FOLDER_URL}/${certificateData.uuid}`;
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       } else {
@@ -162,8 +164,9 @@ export default {
             height: 595,
           },
         });
+
         imageUrls.push(
-          `/uploads/${certificateData.uuid}/img_${certificateData.uuid}_page${i}.jpeg`
+          `${BASE_URL}/api/certificate/${certificateData.uuid}/img_${certificateData.uuid}_page${i}.jpeg`
         );
         if (i === 1) {
           const smallImagePath = path.join(
@@ -173,13 +176,13 @@ export default {
           await page.setViewport({
             width: 842,
             height: 595,
-            deviceScaleFactor: 0.3,
+            deviceScaleFactor: 0.35,
           });
 
           await page.screenshot({
             path: smallImagePath,
             type: 'jpeg',
-            quality: 80,
+            quality: 100,
             fullPage: false,
             clip: {
               x: 0,
@@ -190,7 +193,7 @@ export default {
           });
 
           imageUrls.push(
-            `/uploads/${certificateData.uuid}/img_${certificateData.uuid}_page${i}_small.jpeg`
+            `${BASE_URL}/api/certificate/${certificateData.uuid}/img_${certificateData.uuid}_page${i}_small.jpeg`
           );
           await page.setViewport({
             width: 842,
@@ -258,7 +261,7 @@ export default {
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
       // Визначення абсолютного шляху до директорії
-      const uploadDir = `./public/uploads/${updatedCertificate.uuid}`;
+      const uploadDir = `${FOLDER_URL}/${updatedCertificate.uuid}`;
 
       // Перевірка та створення директорії, якщо вона не існує
       if (!fs.existsSync(uploadDir)) {
@@ -301,7 +304,7 @@ export default {
           },
         });
         imageUrls.push(
-          `/uploads/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}.jpeg`
+          `${BASE_URL}/api/certificate/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}.jpeg`
         );
         if (i === 1) {
           const smallImagePath = path.join(
@@ -311,13 +314,13 @@ export default {
           await page.setViewport({
             width: 842,
             height: 595,
-            deviceScaleFactor: 0.3,
+            deviceScaleFactor: 0.35,
           });
 
           await page.screenshot({
             path: smallImagePath,
             type: 'jpeg',
-            quality: 80,
+            quality: 100,
             fullPage: false,
             clip: {
               x: 0,
@@ -328,7 +331,7 @@ export default {
           });
 
           imageUrls.push(
-            `/uploads/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}_small.jpeg`
+            `${BASE_URL}/api/certificate/${updatedCertificate.uuid}/img_${updatedCertificate.uuid}_page${i}_small.jpeg`
           );
           await page.setViewport({
             width: 842,
@@ -340,7 +343,7 @@ export default {
 
       await browser.close();
 
-      const pdfUrl = `/uploads/${updatedCertificate.uuid}/Certificate_${updatedCertificate.uuid}.pdf`;
+      const pdfUrl = `${BASE_URL}/api/certificate/${updatedCertificate.uuid}/Certificate_${updatedCertificate.uuid}.pdf`;
       return ctx.send({ pdfUrl });
     } catch (error) {
       console.error('Помилка при оновленні сертифіката:', error);

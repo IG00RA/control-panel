@@ -52,8 +52,8 @@ export function generateCertificateHtml(certificateData) {
     certificateData.gender === 'male'
       ? 'пройшов курс “Арбітраж трафіку” від команди Mustage Team'
       : certificateData.gender === 'female'
-        ? 'пройшла курс “Арбітраж трафіку” від команди Mustage Team'
-        : 'пройшов(ла) курс “Арбітраж трафіку” від команди Mustage Team';
+      ? 'пройшла курс “Арбітраж трафіку” від команди Mustage Team'
+      : 'пройшов(ла) курс “Арбітраж трафіку” від команди Mustage Team';
 
   // HTML-шаблон
   return `<!DOCTYPE html>
@@ -432,13 +432,6 @@ export function generateCertificateHtml(certificateData) {
         margin-bottom: 24px;
       }
 
-      .video {
-        width: 100%;
-        height: 100%;
-        border: none;
-        border-radius: 24px;
-      }
-
       .video_icon {
         display: block;
         position: absolute;
@@ -455,11 +448,15 @@ export function generateCertificateHtml(certificateData) {
       }
 
       .video_box {
+  overflow: hidden;
         width: 100%;
         height: 100%;
         position: absolute;
         top: 0;
         left: 0;
+                border: none;
+       border-radius: 13px;
+       
       }
 
       .video_icon_img {
@@ -889,10 +886,14 @@ export function generateCertificateHtml(certificateData) {
       <div class="notion_link_wrap">
         <h2 class="card_header">Відеовідгук від СЕО курса:</h2>
         <div class="video_wrap">
-          <div class="video_box"></div>
+  <img
+      src="https://img.youtube.com/vi/${certificateData.videoReview}/hqdefault.jpg"
+      alt="Прев'ю відео відгуку"
+      class="video_box"
+    />
           <a
             class="video_icon"
-            href="${certificateData.videoReview}"
+            href="https://www.youtube.com/watch?v=${certificateData.videoReview}"
             target="_blank"
             rel="noopener noreferrer"
           >

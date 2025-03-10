@@ -569,10 +569,10 @@ const HomePage: React.FC<HomePageProps> = () => {
 
         <InputField
           id="videoReview"
-          label="Посилання на відео-відгук"
+          label="Youtube id на відео-відгук"
           value={data.videoReview}
           onChange={(value) => updateData('videoReview', value)}
-          placeholder="Введіть посилання"
+          placeholder="Введіть id відео Youtube"
           style={{ gridColumn: 'span 6', ...styles.card }}
         />
 
