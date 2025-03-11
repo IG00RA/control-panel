@@ -5,14 +5,18 @@ interface FetchGradesProps {
   onGradesFetched: (grades: any) => void;
   onTelegramIdChange: (telegramId: string) => void;
   onReset?: (resetFn: () => void) => void;
-  initialTelegramId?: string; // Додаємо пропс для початкового значення
+  initialTelegramId?: string;
+  setNotification?: (
+    notification: { message: string; variant: 'success' | 'danger' } | null
+  ) => void; // Додаємо опціональний пропс для сповіщень
 }
 
 const FetchGrades: React.FC<FetchGradesProps> = ({
   onGradesFetched,
   onTelegramIdChange,
   onReset,
-  initialTelegramId = '', // Значення за замовчуванням - порожній рядок
+  initialTelegramId = '',
+  setNotification,
 }) => {
   const [telegramId, setTelegramId] = useState(initialTelegramId);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,18 +32,63 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
   };
 
   const handleFetch = async () => {
+    if (!telegramId) {
+      if (setNotification) {
+        setNotification({
+          message: 'Введіть Telegram ID',
+          variant: 'danger',
+        });
+      }
+      return;
+    }
+
     setIsLoading(true);
+
     try {
       const res = await fetch('/certificate-generator/fetch-grades', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+        },
         body: JSON.stringify({ telegramId }),
       });
+
+      // Перевіряємо, чи успішна відповідь
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Не авторизовано. Увійдіть у систему.');
+        } else {
+          const errorData = await res.json();
+          throw new Error(errorData.error?.message || 'Помилка при отриманні оцінок');
+        }
+      }
+
       const data = await res.json();
+      if (!data) {
+        throw new Error('Оцінки не отримано від сервера');
+      }
+
       onGradesFetched(data);
       onTelegramIdChange(telegramId);
-    } catch (error) {
+
+      // Якщо є функція сповіщення, показуємо успіх
+      if (setNotification) {
+        setNotification({
+          message: 'Оцінки успішно отримано',
+          variant: 'success',
+        });
+      }
+    } catch (error: any) {
       console.error('Error fetching grades:', error);
+
+      // Якщо є функція сповіщення, показуємо помилку
+      if (setNotification) {
+        setNotification({
+          message: error.message || 'Невідома помилка при отриманні оцінок',
+          variant: 'danger',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +108,7 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTelegramId(e.target.value)}
       />
       <Button onClick={handleFetch} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Отримати оцінки'}
+        {isLoading ? 'Завантаження...' : 'Отримати оцінки'}
       </Button>
     </>
   );

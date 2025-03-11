@@ -66,7 +66,10 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
       if (!isGenerated) {
         const response = await fetch('/certificate-generator/generate-pdf', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+          },
           body: JSON.stringify(certificateData),
         });
         const responseData = await response.json();
@@ -83,7 +86,10 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
       } else {
         const response = await fetch(`/certificate-generator/update-pdf/${certificateId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+          },
           body: JSON.stringify(certificateData),
         });
 

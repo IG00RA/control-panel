@@ -133,7 +133,10 @@ const HomePage: React.FC<HomePageProps> = () => {
     try {
       const res = await fetch('/certificate-generator/find-by-telegram-id', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+        },
         body: JSON.stringify({ searchTelegramId }),
       });
       if (!res.ok) {

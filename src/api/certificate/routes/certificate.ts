@@ -6,8 +6,6 @@ module.exports = {
       handler: "certificate.findOne",
       config: {
         policies: [],
-        middlewares: [],
-        auth: false,
       },
     },
   ],

@@ -5,7 +5,6 @@ export default [
     handler: 'certificate.generateUuid',
     config: {
       policies: [],
-      auth: false,
     },
   },
   {
@@ -14,7 +13,6 @@ export default [
     handler: 'certificate.fetchGrades',
     config: {
       policies: [],
-      auth: false,
     },
   },
   {
@@ -23,7 +21,6 @@ export default [
     handler: 'certificate.generatePdf',
     config: {
       policies: [],
-      auth: false,
     },
   },
   {
@@ -32,7 +29,6 @@ export default [
     handler: 'certificate.updateCertificate',
     config: {
       policies: [],
-      auth: false,
     },
   },
   {
@@ -41,7 +37,6 @@ export default [
     handler: 'certificate.findByTelegramId',
     config: {
       policies: [],
-      auth: false,
     },
   },
 ];

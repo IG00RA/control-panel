@@ -9,8 +9,6 @@ import policies from './policies';
 import routes from './routes';
 import services from './services';
 
-console.log('Loaded content-types:', contentTypes);
-
 export default {
   register,
   bootstrap,
