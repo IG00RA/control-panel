@@ -383,7 +383,7 @@ export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
   attributes: {
     averageGradePercentages: Schema.Attribute.Decimal;
     averageGradePoints: Schema.Attribute.Decimal;
-    caseLink: Schema.Attribute.String;
+    caseLink: Schema.Attribute.String & Schema.Attribute.Unique;
     certStatus: Schema.Attribute.Enumeration<
       ['valid', 'discontinued', 'cancelled']
     >;
@@ -411,6 +411,7 @@ export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
     telegramId: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
+    tgNick: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

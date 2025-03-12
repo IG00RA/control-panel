@@ -860,7 +860,7 @@ export function generateCertificateHtml(certificateData) {
         </tbody>
       </table>
       ${
-        certificateData.tariff === 'pro'
+        certificateData.tariff === ('pro' || 'base')
           ? `
       <p class="notion_link">
         Підсумковий проєкт (кейс):
@@ -881,7 +881,7 @@ export function generateCertificateHtml(certificateData) {
 
     <div class="certificate_block">
       ${
-        certificateData.tariff === 'pro'
+        certificateData.tariff === ('pro' || 'base')
           ? `
       <div class="notion_link_wrap">
         <h2 class="card_header">Відеовідгук від СЕО курса:</h2>

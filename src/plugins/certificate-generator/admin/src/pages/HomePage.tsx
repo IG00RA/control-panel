@@ -32,6 +32,7 @@ export interface CertificateData {
   endDate: Date | null;
   tariff: string | null;
   telegramId: string;
+  tgNick: string;
   grades: Grades | null;
   qrCode: string | null;
   averageGradePoints: number | null;
@@ -57,6 +58,7 @@ const HomePage: React.FC<HomePageProps> = () => {
     endDate: null,
     tariff: null,
     telegramId: '',
+    tgNick: '',
     grades: null,
     qrCode: null,
     averageGradePoints: null,
@@ -101,6 +103,7 @@ const HomePage: React.FC<HomePageProps> = () => {
         endDate: null,
         tariff: null,
         telegramId: '',
+        tgNick: '',
         grades: null,
         qrCode: null,
         averageGradePoints: null,
@@ -387,6 +390,7 @@ const HomePage: React.FC<HomePageProps> = () => {
             <FetchGrades
               onTelegramIdChange={handleTelegramIdChange}
               onGradesFetched={(grades: any) => {
+                updateData('tgNick', grades?.homework?.telegramUsername || '');
                 const lessons: Lesson[] = [
                   { lesson: '0.1', tests: ['testN1'], homework: [] },
                   { lesson: '1.1', tests: ['testN2'], homework: [] },

@@ -31,16 +31,28 @@
     },
     "tariff": {
       "type": "enumeration",
-      "enum": ["free", "start", "base", "pro"]
+      "enum": [
+        "free",
+        "start",
+        "base",
+        "pro"
+      ]
     },
     "gender": {
       "type": "enumeration",
-      "enum": ["male", "female"],
+      "enum": [
+        "male",
+        "female"
+      ],
       "default": "male"
     },
     "certStatus": {
       "type": "enumeration",
-      "enum": ["valid", "discontinued", "cancelled"]
+      "enum": [
+        "valid",
+        "discontinued",
+        "cancelled"
+      ]
     },
     "grades": {
       "type": "json"
@@ -61,7 +73,8 @@
       "type": "string"
     },
     "caseLink": {
-      "type": "string"
+      "type": "string",
+      "unique": true
     },
     "pdfPath": {
       "type": "string"
@@ -70,6 +83,9 @@
       "type": "string",
       "unique": true,
       "required": true
+    },
+    "tgNick": {
+      "type": "string"
     }
   }
 }
