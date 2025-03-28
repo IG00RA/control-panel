@@ -558,6 +558,7 @@ const HomePage: React.FC<HomePageProps> = () => {
             <QuillEditor
               value={data.recommendationsCurator}
               onChange={(content: string) => updateData('recommendationsCurator', content)}
+              maxLength={430} // Обмеження символів
             />
           </div>
         </div>
@@ -570,6 +571,7 @@ const HomePage: React.FC<HomePageProps> = () => {
             <QuillEditor
               value={data.recommendationsMentor}
               onChange={(content: string) => updateData('recommendationsMentor', content)}
+              maxLength={1000}
             />
           </div>
         </div>

@@ -399,6 +399,14 @@ export function generateCertificateHtml(certificateData) {
         font-weight: 600;
         color: #000;
       }
+      .case_link {
+           margin-bottom: -4px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 52ch;
+}
       .notion_link_video {
         color: #000;
         font-size: 14px;
@@ -865,6 +873,7 @@ export function generateCertificateHtml(certificateData) {
       <p class="notion_link">
         Підсумковий проєкт (кейс):
         <a
+        class="case_link"
           href="${certificateData.caseLink}"
           target="_blank"
           rel="noopener noreferrer"
@@ -913,6 +922,7 @@ export function generateCertificateHtml(certificateData) {
             href="${certificateData.caseLink}"
             target="_blank"
             rel="noopener noreferrer"
+            class="case_link"
             >${certificateData.caseLink}</a
           >
         </p>
