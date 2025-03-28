@@ -10,15 +10,25 @@ interface DatePickerFieldProps {
   labelStyle?: React.CSSProperties;
 }
 
+export const normalizeDate = (date: Date | null): Date | null => {
+  if (!date) return null;
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+};
+
 const DatePickerField: React.FC<DatePickerFieldProps> = React.memo(
   ({ id, label, value, onChange, style, labelStyle }) => {
     const handleChange = (date: Date) => {
-      onChange(date);
+      // Нормалізуємо дату перед передачею в onChange
+      const normalizedDate = normalizeDate(date);
+      onChange(normalizedDate);
     };
 
     const handleClear = () => {
       onChange(null);
     };
+
+    // Нормалізуємо значення для відображення
+    const displayValue = value ? new Date(value) : null;
 
     return (
       <div style={style}>
@@ -27,7 +37,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = React.memo(
         </label>
         <DatePicker
           id={id}
-          value={value}
+          value={displayValue} // Використовуємо ненормалізовану дату для відображення
           onChange={handleChange}
           onClear={handleClear}
           locale="ru-RU"

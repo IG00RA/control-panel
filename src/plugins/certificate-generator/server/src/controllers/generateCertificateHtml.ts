@@ -18,7 +18,7 @@ export function generateCertificateHtml(certificateData) {
       base: 'Base',
       pro: 'Pro',
     };
-    return `тариф "${tariffMap[tariff] || 'Unknown'}"`;
+    return `"${tariffMap[tariff] || 'Unknown'}"`;
   };
 
   const getGradeData = (lessonNumber: string) => {

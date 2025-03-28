@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@strapi/design-system';
 import { CertificateData } from 'src/pages/HomePage';
-import { toast } from 'react-toastify';
 
 interface GeneratePdfButtonProps {
   certificateData: CertificateData;
@@ -60,7 +59,6 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
 
   const handleGeneratePdf = async () => {
     if (!validateFields()) return;
-
     setIsLoading(true);
     try {
       if (!isGenerated) {

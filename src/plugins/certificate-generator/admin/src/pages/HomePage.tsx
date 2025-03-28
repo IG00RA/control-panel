@@ -7,7 +7,7 @@ import InputField from '../components/InputField';
 import TariffSelect from '../components/TariffSelect';
 import GenderSelect from '../components/GenderSelect';
 import StatusSelect from '../components/StatusSelect';
-import DatePickerField from '../components/DatePickerField';
+import DatePickerField, { normalizeDate } from '../components/DatePickerField';
 import { Button } from '@strapi/design-system';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -147,16 +147,12 @@ const HomePage: React.FC<HomePageProps> = () => {
       }
       const certificate = await res.json();
       if (certificate) {
-        // Використовуємо let замість const, щоб дозволити переназначення
-        let startDate = certificate.startDate ? new Date(certificate.startDate) : null;
-        let endDate = certificate.endDate ? new Date(certificate.endDate) : null;
-
-        if (startDate && isNaN(startDate.getTime())) {
-          startDate = null;
-        }
-        if (endDate && isNaN(endDate.getTime())) {
-          endDate = null;
-        }
+        console.log('certificate', certificate);
+        // Нормалізуємо дати з сервера
+        let startDate = certificate.startDate
+          ? normalizeDate(new Date(certificate.startDate))
+          : null;
+        let endDate = certificate.endDate ? normalizeDate(new Date(certificate.endDate)) : null;
 
         setData({
           ...data,
@@ -181,7 +177,6 @@ const HomePage: React.FC<HomePageProps> = () => {
       setIsSearchLoading(false);
     }
   };
-
   useEffect(() => {
     if (searchTelegramId && isSearchDisabled) {
       setIsSearchDisabled(false);
@@ -382,7 +377,7 @@ const HomePage: React.FC<HomePageProps> = () => {
           labelStyle={styles.label}
         />
 
-        <div style={{ gridColumn: 'span 6', ...styles.card }}>
+        <div style={{ gridColumn: 'span 8', ...styles.card }}>
           <label htmlFor="telegramId" style={styles.label}>
             Telegram ID
           </label>
@@ -409,12 +404,20 @@ const HomePage: React.FC<HomePageProps> = () => {
                   { lesson: '3.4', tests: ['testN16'], homework: ['hN12'] },
                   { lesson: '4.1', tests: ['testN18'], homework: ['hN19'] },
                   { lesson: '4.2', tests: ['testN19'], homework: ['hN20'] },
-                  { lesson: '4.3', tests: ['testN20'], homework: ['hN21', 'hN30'] },
+                  {
+                    lesson: '4.3',
+                    tests: ['testN20'],
+                    homework: ['hN21', 'hN30'],
+                  },
                   { lesson: '5.1', tests: [], homework: [] },
                   { lesson: '5.2', tests: [], homework: ['hN14'] },
                   { lesson: '5.3', tests: [], homework: [] },
                   { lesson: '5.4', tests: [], homework: ['hN15'] },
-                  { lesson: '5.5', tests: ['testN17'], homework: ['hN16', 'hN17'] },
+                  {
+                    lesson: '5.5',
+                    tests: ['testN17'],
+                    homework: ['hN16', 'hN17'],
+                  },
                   { lesson: '6.1', tests: [], homework: ['hN22'] },
                   { lesson: '6.2', tests: [], homework: ['hN23'] },
                   { lesson: '6.3', tests: [], homework: ['hN24'] },
@@ -474,7 +477,9 @@ const HomePage: React.FC<HomePageProps> = () => {
                       : null;
                   updateData('averageGradePercentages', avgPercentages);
                 }
-                toast.success('Оцінки успішно отримано з Google!', { autoClose: 3000 });
+                toast.success('Оцінки успішно отримано з Google!', {
+                  autoClose: 3000,
+                });
               }}
               onReset={(resetFn) => (fetchGradesResetRef.current = resetFn)}
               initialTelegramId={data.telegramId}
@@ -534,19 +539,33 @@ const HomePage: React.FC<HomePageProps> = () => {
           )}
         </div>
 
-        <div style={{ gridColumn: 'span 3', ...styles.card }}>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{data.averageGradePoints ?? '-'}</div>
-            <div style={styles.label}>Середній бал:</div>
-          </div>
-        </div>
-
-        <div style={{ gridColumn: 'span 3', ...styles.card }}>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>
-              {data.averageGradePoints ? `${data.averageGradePercentages}%` : '-'}
+        <div
+          style={{
+            gridColumn: 'span 4',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+            ...styles.card,
+          }}
+        >
+          <InputField
+            id="tgNick"
+            label="Telegram нікнейм"
+            value={data.tgNick}
+            onChange={(value) => updateData('tgNick', value)}
+            placeholder="Telegram нікнейм"
+          />
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={styles.statCard}>
+              <div style={styles.label}>Середній бал в %:</div>
+              <div style={styles.statValue}>
+                {data.averageGradePoints ? `${data.averageGradePercentages}%` : '-'}
+              </div>
             </div>
-            <div style={styles.label}>Середній бал в %:</div>
+            <div style={styles.statCard}>
+              <div style={styles.label}>Середній бал:</div>
+              <div style={styles.statValue}>{data.averageGradePoints ?? '-'}</div>
+            </div>
           </div>
         </div>
 
