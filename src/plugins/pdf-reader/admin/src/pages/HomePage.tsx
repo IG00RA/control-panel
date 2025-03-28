@@ -21,6 +21,10 @@ const HomePage: React.FC = () => {
     window.open(fileUrl, '_blank');
   };
 
+  if (!files) {
+    return <Typography textColor="neutral500">No PDF files available.</Typography>;
+  }
+
   return (
     <Main>
       <Box padding={8} background="neutral100">
@@ -28,7 +32,7 @@ const HomePage: React.FC = () => {
           Resume Files on Drive
         </Typography>
         <Box padding={4} background="neutral0" shadow="tableShadow" hasRadius>
-          {files.length > 0 ? (
+          {files && files?.length > 0 ? (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {files.map((file) => (
                 <li key={file.id} style={{ marginBottom: '16px' }}>
