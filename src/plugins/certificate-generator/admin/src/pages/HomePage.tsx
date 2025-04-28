@@ -147,7 +147,6 @@ const HomePage: React.FC<HomePageProps> = () => {
       }
       const certificate = await res.json();
       if (certificate) {
-        console.log('certificate', certificate);
         // Нормалізуємо дати з сервера
         let startDate = certificate.startDate
           ? normalizeDate(new Date(certificate.startDate))
