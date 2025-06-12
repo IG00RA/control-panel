@@ -7,6 +7,7 @@ import usersPermissions from "@strapi/plugin-users-permissions/strapi-admin";
 import strapiImportExport from "strapi-import-export/strapi-admin";
 import pdfReader from "../../src/plugins/pdf-reader/./dist/admin/index.mjs";
 import certificateGenerator from "../../src/plugins/certificate-generator/./dist/admin/index.mjs";
+import shortLinks from "../../src/plugins/short-links/./dist/admin/index.mjs";
 import { renderAdmin } from "@strapi/strapi/admin";
 
 import customisations from "../../src/admin/app.tsx";
@@ -20,5 +21,6 @@ renderAdmin(document.getElementById("strapi"), {
     "strapi-import-export": strapiImportExport,
     "pdf-reader": pdfReader,
     "certificate-generator": certificateGenerator,
+    "short-links": shortLinks,
   },
 });

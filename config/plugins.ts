@@ -7,4 +7,8 @@ export default {
     enabled: true,
     resolve: "./src/plugins/certificate-generator",
   },
+  "short-links": {
+    enabled: true,
+    resolve: "./src/plugins/short-links",
+  },
 };

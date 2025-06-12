@@ -574,6 +574,39 @@ export interface ApiMainPageElementMainPageElement
   };
 }
 
+export interface ApiShortLinkShortLink extends Struct.CollectionTypeSchema {
+  collectionName: 'short_links';
+  info: {
+    displayName: 'Short Link';
+    pluralName: 'short-links';
+    singularName: 'short-link';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    createdByUser: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::short-link.short-link'
+    > &
+      Schema.Attribute.Private;
+    originalUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    parameters: Schema.Attribute.JSON & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    shortCode: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiTariffTariff extends Struct.CollectionTypeSchema {
   collectionName: 'tariffs';
   info: {
@@ -1232,6 +1265,7 @@ declare module '@strapi/strapi' {
       'api::consumable.consumable': ApiConsumableConsumable;
       'api::displayed-price.displayed-price': ApiDisplayedPriceDisplayedPrice;
       'api::main-page-element.main-page-element': ApiMainPageElementMainPageElement;
+      'api::short-link.short-link': ApiShortLinkShortLink;
       'api::tariff.tariff': ApiTariffTariff;
       'api::vacancy.vacancy': ApiVacancyVacancy;
       'plugin::content-releases.release': PluginContentReleasesRelease;
