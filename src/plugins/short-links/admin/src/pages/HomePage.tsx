@@ -21,8 +21,8 @@ const ShortLinkCreator: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    // Filter out empty parameters and create an object
-    const nonEmptyParams = parameters
+    // Define type for nonEmptyParams
+    const nonEmptyParams: Record<string, string> = parameters
       .map((value, index) => (value ? `sub${index + 1}: ${value}` : null))
       .filter(Boolean)
       .reduce((acc, curr, index) => ({ ...acc, [`sub${index + 1}`]: curr?.split(': ')[1] }), {});
