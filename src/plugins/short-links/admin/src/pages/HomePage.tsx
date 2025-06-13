@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextInput, Box, Typography, Flex } from '@strapi/design-system';
-import { useFetchClient } from '@strapi/strapi/admin';
+import { Duplicate } from '@strapi/icons';
 
 const ShortLinkCreator: React.FC = () => {
   const [parameters, setParameters] = useState<Array<string>>(Array(8).fill(''));
@@ -9,7 +9,7 @@ const ShortLinkCreator: React.FC = () => {
   const [shortUrl, setShortUrl] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { post } = useFetchClient();
+  const [copied, setCopied] = useState<boolean>(false);
 
   const handleParameterChange = (index: number, value: string) => {
     const updatedParameters = [...parameters];
@@ -17,31 +17,53 @@ const ShortLinkCreator: React.FC = () => {
     setParameters(updatedParameters);
   };
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shortUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      setError('Ошибка при копировании ссылки');
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
 
-    // Define type for nonEmptyParams
     const nonEmptyParams: Record<string, string> = parameters
       .map((value, index) => (value ? `sub${index + 1}: ${value}` : null))
       .filter(Boolean)
       .reduce((acc, curr, index) => ({ ...acc, [`sub${index + 1}`]: curr?.split(': ')[1] }), {});
 
-    // Add fbp and refId if they exist
     if (fbp) nonEmptyParams['fbp'] = fbp;
     if (refId) nonEmptyParams['ref_id'] = refId;
 
+    const token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+
     try {
-      const response = await post('/short-links/short', {
-        data: {
-          parameters: nonEmptyParams,
-          originalUrl: 'https://spreadsheets.mustage.team/ua',
-          createdByUser: 'admin', // Replace with actual user ID or logic to get authenticated user
+      const response = await fetch('/short-links/short', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
+        body: JSON.stringify({
+          data: {
+            parameters: nonEmptyParams,
+            originalUrl: 'https://spreadsheets.mustage.team/ua',
+            createdByUser: 'admin',
+          },
+        }),
       });
 
-      setShortUrl(response.data.shortUrl);
-      // Clear input fields on successful generation
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      setShortUrl(responseData.shortUrl);
       setParameters(Array(8).fill(''));
       setFbp('');
       setRefId('');
@@ -57,7 +79,6 @@ const ShortLinkCreator: React.FC = () => {
       <Typography variant="alpha">Создать короткую ссылку</Typography>
       <Box paddingTop={4}>
         <Flex direction="column" gap={4}>
-          {/* FBP and RefId inputs */}
           <Flex gap={4} wrap="wrap">
             <Box flex="1" minWidth="200px">
               <TextInput
@@ -79,7 +100,6 @@ const ShortLinkCreator: React.FC = () => {
             </Box>
           </Flex>
 
-          {/* Existing sub parameters */}
           {[...Array(4)].map((_, rowIndex) => (
             <Flex key={`row-${rowIndex}`} gap={4} wrap="wrap">
               <Box flex="1" minWidth="200px">
@@ -112,25 +132,45 @@ const ShortLinkCreator: React.FC = () => {
         </Button>
         {shortUrl && (
           <Box paddingTop={2}>
-            <Typography>
-              Короткая ссылка:{' '}
-              <Typography
-                as="a"
-                href={shortUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                textColor="primary600"
+            <Flex alignItems="center" gap={2}>
+              <Typography>
+                Короткая ссылка:{' '}
+                <Typography
+                  as="a"
+                  href={shortUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  textColor="primary600"
+                  style={{
+                    textDecoration: 'underline',
+                    '&:hover': {
+                      textDecoration: 'none',
+                      color: '#b9b9b9',
+                    },
+                  }}
+                >
+                  {shortUrl}
+                </Typography>
+              </Typography>
+              <button
+                onClick={handleCopy}
+                disabled={!shortUrl}
+                type="button"
+                title={copied ? 'Скопировано!' : 'Копировать ссылку'}
                 style={{
-                  textDecoration: 'underline',
-                  '&:hover': {
-                    textDecoration: 'none',
-                    color: '#b9b9b9',
-                  },
+                  cursor: 'pointer',
+                  padding: '5px',
+                  backgroundColor: 'white',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
                 }}
               >
-                {shortUrl}
-              </Typography>
-            </Typography>
+                <Duplicate style={{ fill: 'blue' }} />
+              </button>
+            </Flex>
           </Box>
         )}
         {error && (

@@ -8,7 +8,7 @@ interface FetchGradesProps {
   initialTelegramId?: string;
   setNotification?: (
     notification: { message: string; variant: 'success' | 'danger' } | null
-  ) => void; // Додаємо опціональний пропс для сповіщень
+  ) => void;
 }
 
 const FetchGrades: React.FC<FetchGradesProps> = ({
@@ -21,7 +21,6 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
   const [telegramId, setTelegramId] = useState(initialTelegramId);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Оновлюємо telegramId, якщо initialTelegramId змінюється
   useEffect(() => {
     setTelegramId(initialTelegramId);
   }, [initialTelegramId]);
@@ -54,7 +53,6 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
         body: JSON.stringify({ telegramId }),
       });
 
-      // Перевіряємо, чи успішна відповідь
       if (!res.ok) {
         if (res.status === 401) {
           throw new Error('Не авторизовано. Увійдіть у систему.');
