@@ -5,6 +5,7 @@ export default [
     handler: 'controller.shortLink',
     config: {
       policies: [],
+      auth: false,
     },
   },
   {

@@ -15,7 +15,7 @@ const controller = ({ strapi }: { strapi: Core.Strapi }) => ({
       const createData = {
         shortCode,
         originalUrl: data.originalUrl,
-        parameters: data.parameters, // Now can include fbp, ref_id, and any number of sub parameters
+        parameters: data.parameters,
         createdByUserId: data.createdByUser || ctx.state.user?.id?.toString() || 'unknown',
         publishedAt: new Date(),
       };
