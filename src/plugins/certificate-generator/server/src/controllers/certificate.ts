@@ -25,6 +25,21 @@ const FOLDER_URL = process.env.REACT_APP_API_FOLDER_URL || '';
 const BASE_URL = process.env.REACT_APP_API_URL || '';
 
 export default {
+  async fetchGrades(ctx) {
+    const { telegramId } = ctx.request.body;
+    const googleSheetsScriptUrl = process.env.GOOGLE_SHEETS_SCRIPT_URL;
+    try {
+      const response = await axios.get(`${googleSheetsScriptUrl}?telegramId=${telegramId}`);
+      const grades = response.data;
+      return ctx.send(grades);
+    } catch (error) {
+      console.error('Error fetching grades:', error);
+      ctx.response.status = 500;
+      ctx.response.body = { error: 'Failed to fetch grades' };
+      return;
+    }
+  },
+
   async findByTelegramId(ctx) {
     const { searchTelegramId } = ctx.request.body;
 
@@ -83,21 +98,6 @@ export default {
       console.error('Error generating UUID:', error);
       ctx.response.status = 500;
       ctx.response.body = { error: 'Failed to generate UUID' };
-      return;
-    }
-  },
-
-  async fetchGrades(ctx) {
-    const { telegramId } = ctx.request.body;
-    const googleSheetsScriptUrl = process.env.GOOGLE_SHEETS_SCRIPT_URL;
-    try {
-      const response = await axios.get(`${googleSheetsScriptUrl}?telegramId=${telegramId}`);
-      const grades = response.data;
-      return ctx.send(grades);
-    } catch (error) {
-      console.error('Error fetching grades:', error);
-      ctx.response.status = 500;
-      ctx.response.body = { error: 'Failed to fetch grades' };
       return;
     }
   },
