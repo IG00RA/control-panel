@@ -14,7 +14,7 @@ const GenerateUuidButton: React.FC<GenerateUuidButtonProps> = ({
   onUuidGenerated,
   onReset,
   isDisabled = false,
-  setNotification, // Додаємо можливість передати функцію для сповіщень
+  setNotification,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
@@ -22,15 +22,18 @@ const GenerateUuidButton: React.FC<GenerateUuidButtonProps> = ({
   const handleClick = async () => {
     setIsLoading(true);
 
+    let token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    if (token === undefined) {
+      token = sessionStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    }
     try {
       const res = await fetch('/certificate-generator/generate-uuid', {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      // Перевіряємо, чи успішна відповідь
       if (!res.ok) {
         if (res.status === 401) {
           throw new Error('Не авторизовано. Увійдіть у систему.');

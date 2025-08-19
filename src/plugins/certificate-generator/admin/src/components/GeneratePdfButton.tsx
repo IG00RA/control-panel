@@ -60,13 +60,17 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
   const handleGeneratePdf = async () => {
     if (!validateFields()) return;
     setIsLoading(true);
+    let token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    if (token === undefined) {
+      token = sessionStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    }
     try {
       if (!isGenerated) {
         const response = await fetch('/certificate-generator/generate-pdf', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(certificateData),
         });
@@ -86,7 +90,7 @@ const GeneratePdfButton: React.FC<GeneratePdfButtonProps> = ({
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(certificateData),
         });

@@ -44,16 +44,10 @@ const FetchGrades: React.FC<FetchGradesProps> = ({
     setIsLoading(true);
 
     try {
-      function getCookie(name: string) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
+      let token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+      if (token === undefined) {
+        token = sessionStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
       }
-
-      const token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')
-        ? localStorage.getItem('jwtToken')?.replace(/['"]+/g, '')
-        : getCookie('access_token');
-
       const res = await fetch('/certificate-generator/fetch-grades', {
         method: 'POST',
         headers: {

@@ -134,11 +134,15 @@ const HomePage: React.FC<HomePageProps> = () => {
 
     setIsSearchLoading(true);
     try {
+        let token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+        if (token === undefined) {
+          token = sessionStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+        }
       const res = await fetch('/certificate-generator/find-by-telegram-id', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ searchTelegramId }),
       });
@@ -147,7 +151,6 @@ const HomePage: React.FC<HomePageProps> = () => {
       }
       const certificate = await res.json();
       if (certificate) {
-        // Нормалізуємо дати з сервера
         let startDate = certificate.startDate
           ? normalizeDate(new Date(certificate.startDate))
           : null;

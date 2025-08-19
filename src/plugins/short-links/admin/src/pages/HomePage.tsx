@@ -39,7 +39,10 @@ const ShortLinkCreator: React.FC = () => {
     if (fbp) nonEmptyParams['fbp'] = fbp;
     if (refId) nonEmptyParams['ref_id'] = refId;
 
-    const token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    let token = localStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    if (token === undefined) {
+      token = sessionStorage?.getItem('jwtToken')?.replace(/['"]+/g, '');
+    }
 
     try {
       const response = await fetch('/short-links/short', {

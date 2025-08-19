@@ -13,7 +13,7 @@ export default [
     handler: 'certificate.fetchGrades',
     config: {
       policies: [],
-      auth: false,
+      // auth: false,
     },
   },
   {

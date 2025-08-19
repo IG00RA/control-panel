@@ -5,7 +5,7 @@ export default [
     handler: 'controller.shortLink',
     config: {
       policies: [],
-      auth: false,
+      // auth: false,
     },
   },
   {
@@ -14,7 +14,7 @@ export default [
     handler: 'controller.getParameters',
     config: {
       policies: [],
-      auth: false,
+      // auth: false,
     },
   },
 ];
